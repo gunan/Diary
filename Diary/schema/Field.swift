@@ -8,7 +8,7 @@ import Foundation
 import SwiftData
 
 
-enum FieldType: CaseIterable {
+enum FieldType: CaseIterable, Identifiable {
     case custom
     case selector
     case time
@@ -28,6 +28,8 @@ enum FieldType: CaseIterable {
             return .custom
         }
     }
+    
+    var id: Self { self }
     
     func toInt() -> Int {
         switch self {
@@ -73,6 +75,12 @@ class FieldDef: Codable {
         case name
         case type
         case options
+    }
+    
+    init(_ from: FieldDef) {
+        self.name = from.name
+        self.type = from.type
+        self.options = from.options
     }
     
     init(_ name: String, _ fieldType: FieldType = FieldType.custom) {

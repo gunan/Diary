@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 
-struct EditfieldModalView: View {
+struct EditFieldModalView: View {
     @Binding var editingField: FieldDef
 
     @State private var newSelectionName: String = ""
@@ -21,10 +21,9 @@ struct EditfieldModalView: View {
             Section(header: Text("Field Type")) {
                 Picker("Field Type",
                        selection: $editingField.type) {
-                    Text("custom").tag(0)
-                    Text("selector").tag(1)
-                    Text("date").tag(2)
-                    Text("time").tag(3)
+                    ForEach(FieldType.allCases) { ft in
+                        Text(ft.toString()).tag(ft.toInt())
+                    }
                 }
                 
                 if (FieldType.isSelector(editingField.type)) {
@@ -52,5 +51,5 @@ struct EditfieldModalView: View {
 #Preview {
     
     let editingField = FieldDef("", .custom)
-    EditfieldModalView(editingField: .constant(editingField))
+    EditFieldModalView(editingField: .constant(editingField))
 }

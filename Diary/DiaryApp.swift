@@ -28,7 +28,7 @@ struct DiaryApp: App {
 
     var body: some Scene {
         WindowGroup {
-            CreateDiaryView()
+            DiaryListView()
         }
         .modelContainer(sharedModelContainer)
     }

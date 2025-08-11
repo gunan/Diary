@@ -25,6 +25,20 @@ class Diary: Codable {
         case entries
     }
     
+    init () {
+        self.name = ""
+        self.schema = EntryDef()
+        self.entries = []
+    }
+    
+    func getFieldNames() -> [String] {
+        return self.schema.getFieldNames()
+    }
+    
+    func getFieldDef(_ fieldName: String) -> FieldDef? {
+        return self.schema.getFieldDef(fieldName)
+    }
+    
     required init (from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.name = try container.decode(String.self, forKey: .name)

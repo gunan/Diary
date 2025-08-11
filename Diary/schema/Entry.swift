@@ -11,6 +11,10 @@ import SwiftData
 @Model
 class EntryDef: Codable {
     var schema: Dictionary<String, FieldDef> = [:]
+    
+    init() {
+        self.schema = [:]
+    }
 
     init(schema: Dictionary<String, FieldDef>) {
         self.schema = schema
@@ -18,6 +22,22 @@ class EntryDef: Codable {
     
     func addNewField(_ name: String, _ type: FieldType) {
         self.schema[name] = FieldDef(name, type)
+    }
+    
+    func setField(_ name: String, _ fieldDef: FieldDef) {
+        self.schema[name] = fieldDef
+    }
+    
+    func deleteField(_ name: String) {
+        self.schema.removeValue(forKey: name)
+    }
+    
+    func getFieldNames() -> [String] {
+        return Array(self.schema.keys)
+    }
+    
+    func getFieldDef(_ name: String) -> FieldDef? {
+        return self.schema[name]
     }
     
     enum CodingKeys: String, CodingKey {
