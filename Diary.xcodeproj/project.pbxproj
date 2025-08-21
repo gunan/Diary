@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		60F51E302E56EA720023EFA4 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = 60F51E2F2E56EA720023EFA4 /* Collections */; };
+		60F51E322E56EA880023EFA4 /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 60F51E312E56EA880023EFA4 /* OrderedCollections */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		605560842E4863DB00AA7519 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +57,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				60F51E322E56EA880023EFA4 /* OrderedCollections in Frameworks */,
+				60F51E302E56EA720023EFA4 /* Collections in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +119,8 @@
 			);
 			name = Diary;
 			packageProductDependencies = (
+				60F51E2F2E56EA720023EFA4 /* Collections */,
+				60F51E312E56EA880023EFA4 /* OrderedCollections */,
 			);
 			productName = Diary;
 			productReference = 605560702E4863DA00AA7519 /* Diary.app */;
@@ -195,6 +204,9 @@
 			);
 			mainGroup = 605560672E4863DA00AA7519;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				60F51E0A2E56E6690023EFA4 /* XCRemoteSwiftPackageReference "swift-collections" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 605560712E4863DA00AA7519 /* Products */;
 			projectDirPath = "";
@@ -597,6 +609,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		60F51E0A2E56E6690023EFA4 /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-collections.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		60F51E2F2E56EA720023EFA4 /* Collections */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 60F51E0A2E56E6690023EFA4 /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = Collections;
+		};
+		60F51E312E56EA880023EFA4 /* OrderedCollections */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 60F51E0A2E56E6690023EFA4 /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = OrderedCollections;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 605560682E4863DA00AA7519 /* Project object */;
 }

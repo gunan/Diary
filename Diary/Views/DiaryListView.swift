@@ -14,16 +14,22 @@ struct DiaryListView: View {
     var body: some View {
         NavigationStack {
             List {
-                ForEach(diaries) { diary in
-                    Text(diary.name)
-                }.onTapGesture {
-                    // TODO
+                Section {
+                    ForEach(diaries) { diary in
+                        NavigationLink {
+                            ShowDiaryView(diary: diary)
+                        } label: {
+                            Text(diary.name)
+                        }
+                    }
                 }
                 
                 NavigationLink("Add New Diary") {
                     CreateDiaryView()
                 }
+                .buttonStyle(.borderedProminent)
             }
+            .listStyle(InsetGroupedListStyle())
             .navigationTitle("All Your Diaries")
         }
     }
@@ -31,6 +37,6 @@ struct DiaryListView: View {
 
 #Preview {
     DiaryListView()
-        .modelContainer(for: Diary.self, inMemory: true)
+        .modelContainer(SampleDiaryList.shared.modelContainer)
 }
     

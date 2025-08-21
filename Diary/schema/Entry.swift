@@ -7,16 +7,17 @@
 
 import Foundation
 import SwiftData
+import OrderedCollections
 
 @Model
 class EntryDef: Codable {
-    var schema: Dictionary<String, FieldDef> = [:]
+    var schema: OrderedDictionary<String, FieldDef> = [:]
     
     init() {
         self.schema = [:]
     }
 
-    init(schema: Dictionary<String, FieldDef>) {
+    init(schema: OrderedDictionary<String, FieldDef>) {
         self.schema = schema
     }
     
@@ -46,7 +47,7 @@ class EntryDef: Codable {
     
     required init (from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.schema = try container.decode(Dictionary<String, FieldDef>.self, forKey: .schema)
+        self.schema = try container.decode(OrderedDictionary<String, FieldDef>.self, forKey: .schema)
     }
     
     func encode(to encoder: Encoder) throws {
@@ -73,6 +74,12 @@ class Entry: Codable {
     
     func getSchema() -> EntryDef {
         return self.def
+    }
+    
+    func getFieldDict() -> OrderedDictionary<String, Any> {
+        let fieldNames = self.def.getFieldNames()
+        return OrderedDictionary<String, Any> (
+            uniqueKeysWithValues: zip(fieldNames, self.fields.indices.map { self.fields[$0] }))
     }
     
     func getFields() -> [Any] {

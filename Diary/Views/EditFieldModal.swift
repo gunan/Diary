@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 
-struct EditFieldModalView: View {
+struct EditFieldModal: View {
     @Binding var editingField: FieldDef
 
     @State private var newSelectionName: String = ""
@@ -51,5 +51,5 @@ struct EditFieldModalView: View {
 #Preview {
     
     let editingField = FieldDef("", .custom)
-    EditFieldModalView(editingField: .constant(editingField))
+    EditFieldModal(editingField: .constant(editingField))
 }

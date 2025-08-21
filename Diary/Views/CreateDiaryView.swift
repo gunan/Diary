@@ -88,7 +88,7 @@ struct CreateDiaryView: View {
         .listStyle(InsetGroupedListStyle())
         .sheet(isPresented: $showNewFieldEditor) {
             NavigationStack {
-                EditFieldModalView(editingField: $tempFieldDef)
+                EditFieldModal(editingField: $tempFieldDef)
                     .navigationTitle(editFieldViewTitle)
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
