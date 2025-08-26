@@ -13,26 +13,22 @@ import OrderedCollections
 struct ShowEntryView: View {
     @Bindable var entry: Entry
     
-    let fields: OrderedDictionary<String, Any>
     let defaultValue: String = "No Value"
     
-    init(entry: Entry) {
-        self.entry = entry
-        self.fields = entry.getFieldDict()
-    }
-    
     var body: some View {
-        List {
-            ForEach(fields.keys, id: \.self) { key in
-                Section {
-                    Text(key).bold()
-                    Text("\(fields[key] ?? defaultValue)")
+        NavigationStack {
+            List {
+                ForEach(entry.def.getFieldNames(), id: \.self) { key in
+                    Section {
+                        Text(key).bold()
+                        Text("\(entry.getFieldAsString(key))")
+                    }
                 }
+                
             }
-            
+            .listStyle(InsetGroupedListStyle())
+            .navigationTitle(entry.getDate().ISO8601Format())
         }
-        .listStyle(InsetGroupedListStyle())
-        .navigationTitle(entry.getDate().ISO8601Format())
     }
 }
 

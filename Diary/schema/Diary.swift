@@ -47,6 +47,10 @@ class Diary: Codable {
         return self.schema.getFieldDef(fieldName)
     }
     
+    func getSchema() -> EntryDef {
+        return self.schema
+    }
+    
     required init (from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.name = try container.decode(String.self, forKey: .name)
@@ -60,6 +64,10 @@ class Diary: Codable {
         try container.encode(schema, forKey: .schema)
         try container.encode(entries, forKey: .entries)
     }
+    
+    func newEntry() -> Entry {
+        return Entry(schema: self.schema, date: Date(), fields: [])
+    }
 }
 
 extension Diary {
@@ -67,18 +75,39 @@ extension Diary {
         let entryDef: EntryDef = EntryDef()
         entryDef.addNewField("Title", FieldType.custom)
         entryDef.addNewField("Summary", FieldType.custom)
+        entryDef.addNewField("date", FieldType.date)
+        
+        
+        var selectorField: FieldDef = FieldDef("tags", FieldType.selector)
+        selectorField.setOptions(["medicine", "work", "personal"])
+        entryDef.setField("tags", selectorField)
+        
+        entryDef.addNewField("time", FieldType.time)
         
         var diary: Diary =  Diary(name: "Sample Diary", schema: entryDef)
-        
-        let isoDate = "2024-12-14T04:30:00+05:30"
 
         let fixedFormatter = DateFormatter()
         fixedFormatter.locale = Locale(identifier: "en_US_POSIX")
         fixedFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-        fixedFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        fixedFormatter.dateFormat = "yyyy-MM-dd"
         
-        diary.addEntry(fixedFormatter.date(from: "2024-12-14T04:30:00+05:30")!, ["Hello", "World"])
-        diary.addEntry(fixedFormatter.date(from: "2024-12-15T04:30:00+05:30")!, ["Hello", "World"])
+        let timeFormatter = DateFormatter()
+        timeFormatter.locale = Locale(identifier: "en_US_POSIX")
+        timeFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        timeFormatter.dateFormat = "HH:mm:ss"
+        
+        diary.addEntry(
+            fixedFormatter.date(from: "2024-12-14")!,
+            ["Hello", "World",
+             DateComponents(year: 2024, month: 12, day: 14),
+             "medicine",
+             DateComponents(hour: 4, minute: 30)])
+        diary.addEntry(
+            fixedFormatter.date(from: "2024-12-15")!,
+            ["Hello", "World",
+             DateComponents.init(year: 2024, month: 12, day: 15),
+             "work",
+             DateComponents(hour: 6, minute: 30)])
         
         return diary
     }

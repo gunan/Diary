@@ -9,6 +9,7 @@ import Foundation
 import SwiftData
 import OrderedCollections
 
+
 @Model
 class EntryDef: Codable {
     var schema: OrderedDictionary<String, FieldDef> = [:]
@@ -37,6 +38,13 @@ class EntryDef: Codable {
         return Array(self.schema.keys)
     }
     
+    func getFieldType(_ name: String) -> FieldType? {
+        if self.schema[name] != nil {
+            return self.schema[name]?.getType()
+        }
+        return nil
+    }
+    
     func getFieldDef(_ name: String) -> FieldDef? {
         return self.schema[name]
     }
@@ -60,12 +68,36 @@ class EntryDef: Codable {
 class Entry: Codable {
     var def: EntryDef
     var date: Date
-    var fields: [String]
+    var dateTimeFields: Dictionary<String, DateComponents> = [:]
+    var textFields: Dictionary<String, String> = [:]
     
     init(schema: EntryDef, date: Date, fields: [Any]) {
         self.def = schema
         self.date = date
-        self.fields = fields.map {String (describing: $0)}
+    }
+    
+    static func formatDate(_ date: DateComponents) -> String {
+        let dateFormatter = DateComponentsFormatter()
+        dateFormatter.allowedUnits = [.year, .month, .day]
+        dateFormatter.zeroFormattingBehavior = .dropAll
+        
+        if let formattedDate = dateFormatter.string(from: date) {
+            return formattedDate;
+        } else {
+            return "";
+        }
+    }
+    
+    static func formatTime(_ date: DateComponents) -> String {
+        let dateFormatter = DateComponentsFormatter()
+        dateFormatter.allowedUnits = [.hour, .minute]
+        dateFormatter.zeroFormattingBehavior = .dropAll
+        
+        if let formattedTime = dateFormatter.string(from: date) {
+            return formattedTime;
+        } else {
+            return "";
+        }
     }
     
     func getDate() -> Date {
@@ -76,37 +108,80 @@ class Entry: Codable {
         return self.def
     }
     
-    func getFieldDict() -> OrderedDictionary<String, Any> {
-        let fieldNames = self.def.getFieldNames()
-        return OrderedDictionary<String, Any> (
-            uniqueKeysWithValues: zip(fieldNames, self.fields.indices.map { self.fields[$0] }))
+    func setField(name: String, value: Any) {
+        if self.def.getFieldType(name)!.isDateTime() {
+            self.dateTimeFields[name] = value as? DateComponents
+        } else {
+            self.textFields[name] = value as? String ?? ""
+        }
     }
     
-    func getFields() -> [Any] {
-        return self.fields
+    func setDateField(name: String, value: DateComponents) {
+        if self.def.getFieldType(name)!.isDateTime() {
+            self.dateTimeFields[name] = value as DateComponents
+        }
     }
     
-    func setFields(values: [Any]) {
-        self.fields = values.map { String(describing: $0) }
+    func setDateField(name: String, value: Date) {
+        if self.def.getFieldType(name)!.isDateTime() {
+            if self.def.getFieldType(name) == FieldType.date {
+                self.dateTimeFields[name] = Calendar.current.dateComponents([.year, .month, .day], from: value);
+            } else if self.def.getFieldType(name) == FieldType.time {
+                self.dateTimeFields[name] = Calendar.current.dateComponents([.hour, .minute], from: value);
+            }
+        }
+    }
+    
+    func getDateField(_ name: String) -> DateComponents? {
+        if self.def.getFieldType(name)!.isDateTime() {
+            return self.dateTimeFields[name]
+        } else {
+            return nil
+        }
+    }
+    
+    func getField(name: String) -> Any {
+        if self.def.getFieldType(name)!.isDateTime() {
+            return self.dateTimeFields[name] as Any;
+        } else {
+            return self.textFields[name] as Any;
+        }
+    }
+    
+    func getFieldAsString(_ name: String) -> String {
+        if self.def.getFieldType(name) == nil {
+            return "Invalid Field";
+        } else {
+            if self.def.getFieldType(name) == FieldType.date {
+                return Entry.formatDate(self.dateTimeFields[name] ?? DateComponents(year: 1970, month: 1, day: 1));
+            } else if self.def.getFieldType(name) == FieldType.time {
+                return Entry.formatTime(self.dateTimeFields[name] ?? DateComponents(hour: 0, minute: 0));
+            } else {
+                return self.textFields[name] ?? "" as String;
+            }
+        }
     }
     
     enum CodingKeys: String, CodingKey {
         case def
         case date
-        case fields
+        case dateTimeFields
+        case textFields
     }
     
     required init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.def = try container.decode(EntryDef.self, forKey: .def)
         self.date = try container.decode(Date.self, forKey: .date)
-        self.fields = try container.decode([String].self, forKey: .fields)
+        self.dateTimeFields = try container.decode(Dictionary.self, forKey: .dateTimeFields)
+        self.textFields = try container.decode(Dictionary.self, forKey: .textFields)
     }
     
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(def, forKey: .def)
         try container.encode(date, forKey: .date)
-        try container.encode(fields, forKey: .fields)
+        try container.encode(dateTimeFields, forKey: .dateTimeFields)
+        try container.encode(textFields, forKey: .textFields)
     }
 }

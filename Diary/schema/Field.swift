@@ -63,6 +63,10 @@ enum FieldType: CaseIterable, Identifiable {
     static func isSelector(_ val: Int) -> Bool {
         return FieldType.fromint(val) == .selector
     }
+    
+    func isDateTime() -> Bool {
+        return self == .date || self == .time
+    }
 }
 
 @Model

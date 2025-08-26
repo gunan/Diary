@@ -16,24 +16,29 @@ struct ShowDiaryView: View {
     // set a list of reminders for each day to send.
 
     var body: some View {
-        List {
-            Button(action: {
-            }) {
-                Text("Create New Entry")
-            }
-            
-            Section(header: Text("Entries")) {
-                ForEach(diary.getEntries(), id: \.self) { entry in
-                    NavigationLink {
-                        ShowEntryView(entry: entry)
-                    } label: {
-                        Text((entry.getDate().ISO8601Format()))
-                    }
+        NavigationStack {
+            List {
+                NavigationLink(destination: CreateEntryView(diary: self.diary)) {
+                                    Text("Create New Entry")
+                                        .foregroundStyle(Color.white)
+                                        .font(.title)
+                                        .padding()
+                                        .background(Color.pink.clipShape(.rect(cornerRadius: 15)))
+                                }
+                
+                Section(header: Text("Entries")) {
+                    ForEach(diary.getEntries(), id: \.self) { entry in
+                        NavigationLink {
+                            ShowEntryView(entry: entry)
+                        } label: {
+                            Text((entry.getDate().ISO8601Format()))
+                        }
                     }
                 }
             }
-        .navigationTitle($diary.name)
-        .listStyle(InsetGroupedListStyle())
+            .navigationTitle($diary.name)
+            .listStyle(InsetGroupedListStyle())
+        }
     }
 }
 
