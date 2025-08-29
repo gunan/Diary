@@ -10,11 +10,15 @@ import SwiftData
 
 @Model
 class Diary: Codable {
+    var creation_date: Date
     var name: String
     var schema: EntryDef
+    
+    @Relationship(deleteRule: .cascade)
     var entries: [Entry] = []
     
     init(name: String, schema: EntryDef) {
+        self.creation_date = Date()
         self.name = name
         self.schema = schema
     }
@@ -23,9 +27,11 @@ class Diary: Codable {
         case name
         case schema
         case entries
+        case creation_date
     }
     
     init () {
+        self.creation_date = Date()
         self.name = ""
         self.schema = EntryDef()
         self.entries = []
@@ -35,8 +41,12 @@ class Diary: Codable {
         self.entries.append(Entry(schema: self.schema, date: date, fields: fields))
     }
     
+    func addEntry(_ entry: Entry) {
+        self.entries.append(entry)
+    }
+    
     func getEntries() -> [Entry] {
-        return self.entries
+        return self.entries.sorted { $0.date > $1.date }
     }
     
     func getFieldNames() -> [String] {
@@ -56,6 +66,7 @@ class Diary: Codable {
         self.name = try container.decode(String.self, forKey: .name)
         self.schema = try container.decode(EntryDef.self, forKey: .schema)
         self.entries = try container.decode([Entry].self, forKey: .entries)
+        self.creation_date = try container.decode(Date.self, forKey: .creation_date)
     }
     
     func encode(to encoder: Encoder) throws {
@@ -63,6 +74,7 @@ class Diary: Codable {
         try container.encode(name, forKey: .name)
         try container.encode(schema, forKey: .schema)
         try container.encode(entries, forKey: .entries)
+        try container.encode(creation_date, forKey: .creation_date)
     }
     
     func newEntry() -> Entry {

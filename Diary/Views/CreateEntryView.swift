@@ -12,6 +12,9 @@ import SwiftData
 import OrderedCollections
 
 struct CreateEntryView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) var dismiss
+    
     @Bindable var diary: Diary
     @State var entry: Entry
     
@@ -52,6 +55,18 @@ struct CreateEntryView: View {
                     }
                 }
                 
+                Section(header: Text("")) {
+                    Button("Save Entry") {
+                        modelContext.insert(self.entry)
+                        try? modelContext.save()
+                        self.diary.addEntry(self.entry)
+                        dismiss()
+                    }
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                
             }
             .listStyle(InsetGroupedListStyle())
             .navigationTitle(Date().ISO8601Format())
@@ -72,12 +87,7 @@ struct CreateEntryView: View {
     private func dateBinding(for name: String) -> Binding<Date> {
         return Binding<Date>(
             get: {
-                let dateComponents = self.entry.getDateField(name)
-                if dateComponents != nil {
-                    return Calendar.current.date(from:dateComponents!) ?? Date();
-                } else {
-                    return Date()
-                }
+                return self.entry.getDateField(name) ?? Date();
             },
             set: { newValue in
                 self.entry.setDateField(name: name, value: newValue)

@@ -68,35 +68,38 @@ class EntryDef: Codable {
 class Entry: Codable {
     var def: EntryDef
     var date: Date
-    var dateTimeFields: Dictionary<String, DateComponents> = [:]
+    var dateTimeFields: Dictionary<String, Date> = [:]
     var textFields: Dictionary<String, String> = [:]
+    
+    static var dateFormatter: DateFormatter = {
+        var dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        return dateFormatter
+    }()
+    static var timeFormatter: DateFormatter = {
+        var timeFormatter = DateFormatter()
+        timeFormatter.dateFormat = "HH:mm"
+        return timeFormatter
+    }()
     
     init(schema: EntryDef, date: Date, fields: [Any]) {
         self.def = schema
         self.date = date
     }
     
-    static func formatDate(_ date: DateComponents) -> String {
-        let dateFormatter = DateComponentsFormatter()
-        dateFormatter.allowedUnits = [.year, .month, .day]
-        dateFormatter.zeroFormattingBehavior = .dropAll
-        
-        if let formattedDate = dateFormatter.string(from: date) {
-            return formattedDate;
+    static func formatDate(_ date: Date?) -> String {
+        if date == nil {
+            return ""
         } else {
-            return "";
+            return dateFormatter.string(from: date!);
         }
     }
     
-    static func formatTime(_ date: DateComponents) -> String {
-        let dateFormatter = DateComponentsFormatter()
-        dateFormatter.allowedUnits = [.hour, .minute]
-        dateFormatter.zeroFormattingBehavior = .dropAll
-        
-        if let formattedTime = dateFormatter.string(from: date) {
-            return formattedTime;
+    static func formatTime(_ date: Date?) -> String {
+        if date == nil {
+            return ""
         } else {
-            return "";
+            return timeFormatter.string(from: date!);
         }
     }
     
@@ -110,29 +113,19 @@ class Entry: Codable {
     
     func setField(name: String, value: Any) {
         if self.def.getFieldType(name)!.isDateTime() {
-            self.dateTimeFields[name] = value as? DateComponents
+            self.dateTimeFields[name] = value as? Date
         } else {
             self.textFields[name] = value as? String ?? ""
         }
     }
     
-    func setDateField(name: String, value: DateComponents) {
-        if self.def.getFieldType(name)!.isDateTime() {
-            self.dateTimeFields[name] = value as DateComponents
-        }
-    }
-    
     func setDateField(name: String, value: Date) {
         if self.def.getFieldType(name)!.isDateTime() {
-            if self.def.getFieldType(name) == FieldType.date {
-                self.dateTimeFields[name] = Calendar.current.dateComponents([.year, .month, .day], from: value);
-            } else if self.def.getFieldType(name) == FieldType.time {
-                self.dateTimeFields[name] = Calendar.current.dateComponents([.hour, .minute], from: value);
-            }
+            self.dateTimeFields[name] = value
         }
     }
     
-    func getDateField(_ name: String) -> DateComponents? {
+    func getDateField(_ name: String) -> Date? {
         if self.def.getFieldType(name)!.isDateTime() {
             return self.dateTimeFields[name]
         } else {
@@ -153,9 +146,9 @@ class Entry: Codable {
             return "Invalid Field";
         } else {
             if self.def.getFieldType(name) == FieldType.date {
-                return Entry.formatDate(self.dateTimeFields[name] ?? DateComponents(year: 1970, month: 1, day: 1));
+                return Entry.formatDate(self.dateTimeFields[name]);
             } else if self.def.getFieldType(name) == FieldType.time {
-                return Entry.formatTime(self.dateTimeFields[name] ?? DateComponents(hour: 0, minute: 0));
+                return Entry.formatTime(self.dateTimeFields[name]);
             } else {
                 return self.textFields[name] ?? "" as String;
             }

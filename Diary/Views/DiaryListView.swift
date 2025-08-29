@@ -9,7 +9,7 @@ import SwiftData
 
 struct DiaryListView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var diaries: [Diary] = []
+    @Query(sort: \Diary.creation_date) private var diaries: [Diary] = []
 
     var body: some View {
         NavigationStack {
