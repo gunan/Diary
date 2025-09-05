@@ -82,9 +82,12 @@ class Entry: Codable {
         return timeFormatter
     }()
     
-    init(schema: EntryDef, date: Date, fields: [Any]) {
+    init(schema: EntryDef, date: Date, fields: Dictionary<String, Any>) {
         self.def = schema
         self.date = date
+        for (k, v) in fields {
+            self.setField(name: k, value: v)
+        }
     }
     
     static func formatDate(_ date: Date?) -> String {
@@ -150,7 +153,7 @@ class Entry: Codable {
             } else if self.def.getFieldType(name) == FieldType.time {
                 return Entry.formatTime(self.dateTimeFields[name]);
             } else {
-                return self.textFields[name] ?? "" as String;
+                return self.textFields[name] ?? "";
             }
         }
     }

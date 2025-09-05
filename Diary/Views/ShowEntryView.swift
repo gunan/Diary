@@ -27,7 +27,7 @@ struct ShowEntryView: View {
                 
             }
             .listStyle(InsetGroupedListStyle())
-            .navigationTitle(entry.getDate().ISO8601Format())
+            .navigationTitle(Entry.formatDate(entry.getDate()))
         }
     }
 }

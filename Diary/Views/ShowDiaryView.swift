@@ -19,19 +19,15 @@ struct ShowDiaryView: View {
         NavigationStack {
             List {
                 NavigationLink(destination: CreateEntryView(diary: self.diary)) {
-                                    Text("Create New Entry")
-                                        .foregroundStyle(Color.white)
-                                        .font(.title)
-                                        .padding()
-                                        .background(Color.pink.clipShape(.rect(cornerRadius: 15)))
-                                }
+                    Button("Create New Entry", action: {})
+                }
                 
                 Section(header: Text("Entries")) {
                     ForEach(diary.getEntries(), id: \.self) { entry in
                         NavigationLink {
                             ShowEntryView(entry: entry)
                         } label: {
-                            Text((entry.getDate().ISO8601Format()))
+                            Text(Entry.formatDate(entry.getDate()))
                         }
                     }
                 }

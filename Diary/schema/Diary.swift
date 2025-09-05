@@ -37,7 +37,7 @@ class Diary: Codable {
         self.entries = []
     }
     
-    func addEntry(_ date: Date, _ fields: [Any]) {
+    func addEntry(_ date: Date, _ fields: Dictionary<String, Any>) {
         self.entries.append(Entry(schema: self.schema, date: date, fields: fields))
     }
     
@@ -78,7 +78,7 @@ class Diary: Codable {
     }
     
     func newEntry() -> Entry {
-        return Entry(schema: self.schema, date: Date(), fields: [])
+        return Entry(schema: self.schema, date: Date(), fields: [:])
     }
 }
 
@@ -110,16 +110,18 @@ extension Diary {
         
         diary.addEntry(
             fixedFormatter.date(from: "2024-12-14")!,
-            ["Hello", "World",
-             DateComponents(year: 2024, month: 12, day: 14),
-             "medicine",
-             DateComponents(hour: 4, minute: 30)])
+            ["Title": "Hello",
+             "Summary":" World",
+             "date": Calendar.current.date(from:DateComponents(year: 2024, month: 12, day: 14)),
+             "tags": "medicine",
+             "time": Calendar.current.date(from:DateComponents(hour: 4, minute: 30))])
         diary.addEntry(
             fixedFormatter.date(from: "2024-12-15")!,
-            ["Hello", "World",
-             DateComponents.init(year: 2024, month: 12, day: 15),
-             "work",
-             DateComponents(hour: 6, minute: 30)])
+            ["Title": "Hello",
+             "Summary":" World",
+             "date": Calendar.current.date(from:DateComponents.init(year: 2024, month: 12, day: 15)),
+             "tags": "work",
+             "time": Calendar.current.date(from:DateComponents(hour: 6, minute: 30))])
         
         return diary
     }
