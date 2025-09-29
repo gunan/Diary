@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		602943F22E8A4E3400EAC4CE /* privacy_policy.txt in Resources */ = {isa = PBXBuildFile; fileRef = 602943F02E8A4E2800EAC4CE /* privacy_policy.txt */; };
 		60F51E302E56EA720023EFA4 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = 60F51E2F2E56EA720023EFA4 /* Collections */; };
 		60F51E322E56EA880023EFA4 /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 60F51E312E56EA880023EFA4 /* OrderedCollections */; };
 /* End PBXBuildFile section */
@@ -29,6 +30,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		602943F02E8A4E2800EAC4CE /* privacy_policy.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = privacy_policy.txt; sourceTree = "<group>"; };
 		605560702E4863DA00AA7519 /* Diary.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Diary.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		605560832E4863DB00AA7519 /* DiaryTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DiaryTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6055608D2E4863DB00AA7519 /* DiaryUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DiaryUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -86,6 +88,7 @@
 				605560862E4863DB00AA7519 /* DiaryTests */,
 				605560902E4863DB00AA7519 /* DiaryUITests */,
 				605560712E4863DA00AA7519 /* Products */,
+				602943F02E8A4E2800EAC4CE /* privacy_policy.txt */,
 			);
 			sourceTree = "<group>";
 		};
@@ -224,6 +227,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				602943F22E8A4E3400EAC4CE /* privacy_policy.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

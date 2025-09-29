@@ -1,0 +1,34 @@
+Privacy Policy for No Frills Diary
+Effective Date: September 29, 2025
+
+This privacy policy governs your use of the software application No Frills Diary (the “Application”) for mobile devices that was created by Gunhan Gulsoy.
+
+Our Commitment to Your Privacy
+We are committed to protecting your privacy. Our goal is to provide you with a powerful and secure application without compromising your personal information. This policy is simple: The Application collects no user data.
+
+Data Collection and Usage
+We do not collect, store, use, or share any personal or non-personal information from our users. To be perfectly clear, we do not collect:
+
+Personal Information: Your name, email address, phone number, physical address, or any other information that can be used to identify you.
+
+Usage Data: Information about how you interact with the Application, such as which features you use, the frequency of use, or crash logs.
+
+Device and Location Information: Your device's unique identifier (UDID), IP address, operating system version, or your geographic location.
+
+Data from Other Apps: We do not access your contacts, photos, calendar, or any other data stored in other applications on your device.
+
+Since the Application does not collect any data, there is no data to be used, stored, shared, or sold to third parties. All processing and functionality happen exclusively on your device.
+
+Third-Party Services
+The Application does not integrate with any third-party services for analytics, advertising, or any other purpose that would result in the collection of your data.
+
+Children's Privacy
+We do not knowingly collect any personal information from children under the age of 13. Since our Application does not collect any data from any user, we are in full compliance with the Children's Online Privacy Protection Act (COPPA) and other similar regulations.
+
+Changes to This Privacy Policy
+We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page. You are advised to review this Privacy Policy periodically for any changes. Changes to this Privacy Policy are effective when they are posted on this page.
+
+Contact Us
+If you have any questions or suggestions about our Privacy Policy, do not hesitate to contact us.
+
+Gunhan Gulsoy Email: nofrillsdiary@gmail.com
