@@ -33,6 +33,7 @@ struct CreateEntryView: View {
         NavigationStack {
             List {
                 ForEach (self.fieldNames, id: \.self) { key in
+                    
                     Section {
                         Text(key).bold()
                         switch self.schema.getFieldType(key)! {
@@ -69,7 +70,7 @@ struct CreateEntryView: View {
                 
             }
             .listStyle(InsetGroupedListStyle())
-            .navigationTitle(Date().ISO8601Format())
+            .navigationTitle(Entry.formatDate(Date()))
         }
     }
     
