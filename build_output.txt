@@ -1,0 +1,153 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project Diary.xcodeproj -scheme Diary -destination "platform=iOS Simulator,id=03D38C4C-0756-4B02-930D-A10B3C487657" build
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  swift-collections: https://github.com/apple/swift-collections.git @ 1.2.1
+
+2026-01-26 21:45:34.523 xcodebuild[65078:7790476] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, arch:arm64, id:03D38C4C-0756-4B02-930D-A10B3C487657, OS:18.6, name:iPhone 16 Pro }
+{ platform:iOS Simulator, arch:x86_64, id:03D38C4C-0756-4B02-930D-A10B3C487657, OS:18.6, name:iPhone 16 Pro }
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (11 targets)
+    Target 'Diary' in project 'Diary'
+        ➜ Explicit dependency on target 'OrderedCollections' in project 'swift-collections'
+        ➜ Explicit dependency on target 'Collections' in project 'swift-collections'
+    Target 'Collections' in project 'swift-collections'
+        ➜ Explicit dependency on target 'Collections' in project 'swift-collections'
+        ➜ Explicit dependency on target 'InternalCollectionsUtilities' in project 'swift-collections'
+        ➜ Explicit dependency on target 'BitCollections' in project 'swift-collections'
+        ➜ Explicit dependency on target 'DequeModule' in project 'swift-collections'
+        ➜ Explicit dependency on target 'HashTreeCollections' in project 'swift-collections'
+        ➜ Explicit dependency on target 'HeapModule' in project 'swift-collections'
+        ➜ Explicit dependency on target 'OrderedCollections' in project 'swift-collections'
+        ➜ Explicit dependency on target '_RopeModule' in project 'swift-collections'
+    Target 'Collections' in project 'swift-collections'
+        ➜ Explicit dependency on target 'InternalCollectionsUtilities' in project 'swift-collections'
+        ➜ Explicit dependency on target 'BitCollections' in project 'swift-collections'
+        ➜ Explicit dependency on target 'DequeModule' in project 'swift-collections'
+        ➜ Explicit dependency on target 'HashTreeCollections' in project 'swift-collections'
+        ➜ Explicit dependency on target 'HeapModule' in project 'swift-collections'
+        ➜ Explicit dependency on target 'OrderedCollections' in project 'swift-collections'
+        ➜ Explicit dependency on target '_RopeModule' in project 'swift-collections'
+    Target '_RopeModule' in project 'swift-collections'
+        ➜ Explicit dependency on target 'InternalCollectionsUtilities' in project 'swift-collections'
+    Target 'HeapModule' in project 'swift-collections'
+        ➜ Explicit dependency on target 'InternalCollectionsUtilities' in project 'swift-collections'
+    Target 'HashTreeCollections' in project 'swift-collections'
+        ➜ Explicit dependency on target 'InternalCollectionsUtilities' in project 'swift-collections'
+    Target 'DequeModule' in project 'swift-collections'
+        ➜ Explicit dependency on target 'InternalCollectionsUtilities' in project 'swift-collections'
+    Target 'BitCollections' in project 'swift-collections'
+        ➜ Explicit dependency on target 'InternalCollectionsUtilities' in project 'swift-collections'
+    Target 'OrderedCollections' in project 'swift-collections'
+        ➜ Explicit dependency on target 'OrderedCollections' in project 'swift-collections'
+        ➜ Explicit dependency on target 'InternalCollectionsUtilities' in project 'swift-collections'
+    Target 'OrderedCollections' in project 'swift-collections'
+        ➜ Explicit dependency on target 'InternalCollectionsUtilities' in project 'swift-collections'
+    Target 'InternalCollectionsUtilities' in project 'swift-collections' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/gunan/workspace/Diary/Diary/Preview Content/Preview Assets.xcassets /Users/gunan/workspace/Diary/Diary/Assets.xcassets
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+ReadFileContents /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/share/docc/features.json
+
+Build description signature: 67c71e2ae382df3971264ff6f007114d
+Build description path: /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/XCBuildData/67c71e2ae382df3971264ff6f007114d.xcbuilddata
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk /Users/gunan/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.0-23A339-26257891a6c027eb51374368541b8346.sdkstatcache
+    cd /Users/gunan/workspace/Diary/Diary.xcodeproj
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -o /Users/gunan/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.0-23A339-26257891a6c027eb51374368541b8346.sdkstatcache
+
+note: Disabling hardened runtime with ad-hoc codesigning. (in target 'Diary' from project 'Diary')
+ProcessProductPackaging /Users/gunan/workspace/Diary/Diary/Diary.entitlements /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Diary.app-Simulated.xcent (in target 'Diary' from project 'Diary')
+    cd /Users/gunan/workspace/Diary
+    
+    Entitlements:
+    
+    {
+    "application-identifier" = "FC6Z3TU464.com.gunan.Diary";
+}
+    
+    builtin-productPackagingUtility /Users/gunan/workspace/Diary/Diary/Diary.entitlements -entitlements -format xml -o /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Diary.app-Simulated.xcent
+
+ProcessProductPackaging /Users/gunan/workspace/Diary/Diary/Diary.entitlements /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Diary.app.xcent (in target 'Diary' from project 'Diary')
+    cd /Users/gunan/workspace/Diary
+    
+    Entitlements:
+    
+    {
+}
+    
+    builtin-productPackagingUtility /Users/gunan/workspace/Diary/Diary/Diary.entitlements -entitlements -format xml -o /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Diary.app.xcent
+
+ProcessProductPackagingDER /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Diary.app.xcent /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Diary.app.xcent.der (in target 'Diary' from project 'Diary')
+    cd /Users/gunan/workspace/Diary
+    /usr/bin/derq query -f xml -i /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Diary.app.xcent -o /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Diary.app.xcent.der --raw
+
+ProcessProductPackagingDER /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Diary.app-Simulated.xcent /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Diary.app-Simulated.xcent.der (in target 'Diary' from project 'Diary')
+    cd /Users/gunan/workspace/Diary
+    /usr/bin/derq query -f xml -i /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Diary.app-Simulated.xcent -o /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Diary.app-Simulated.xcent.der --raw
+
+CompileAssetCatalogVariant thinned /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Products/Debug-iphonesimulator/Diary.app /Users/gunan/workspace/Diary/Diary/Preview\ Content/Preview\ Assets.xcassets /Users/gunan/workspace/Diary/Diary/Assets.xcassets (in target 'Diary' from project 'Diary')
+    cd /Users/gunan/workspace/Diary
+    /Applications/Xcode.app/Contents/Developer/usr/bin/actool /Users/gunan/workspace/Diary/Diary/Preview\ Content/Preview\ Assets.xcassets /Users/gunan/workspace/Diary/Diary/Assets.xcassets --compile /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/assetcatalog_output/thinned --output-format human-readable-text --notices --warnings --export-dependency-info /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/assetcatalog_dependencies_thinned --output-partial-info-plist /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/assetcatalog_generated_info.plist_thinned --app-icon AppIcon --accent-color AccentColor --compress-pngs --enable-on-demand-resources YES --filter-for-thinning-device-configuration iPhone17,1 --filter-for-device-os-version 18.6 --development-region en --target-device iphone --minimum-deployment-target 18.2 --platform iphonesimulator
+
+SwiftDriver Diary normal arm64 com.apple.xcode.tools.swift.compiler (in target 'Diary' from project 'Diary')
+    cd /Users/gunan/workspace/Diary
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name Diary -Onone -enforce-exclusivity\=checked @/Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Objects-normal/arm64/Diary.SwiftFileList -DDEBUG -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -target arm64-apple-ios18.2-simulator -g -module-cache-path /Users/gunan/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Products/Debug-iphonesimulator -F /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Products/Debug-iphonesimulator -emit-localized-strings -emit-localized-strings-path /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Objects-normal/arm64 -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/gunan/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.0-23A339-26257891a6c027eb51374368541b8346.sdkstatcache -output-file-map /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Objects-normal/arm64/Diary-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/gunan/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/gunan/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Objects-normal/arm64/Diary.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/gunan/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Objects-normal/arm64/Diary_const_extract_protocols.json -Xcc -iquote -Xcc /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Diary-generated-files.hmap -Xcc -I/Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Diary-own-target-headers.hmap -Xcc -I/Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Diary-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary-972586b2ba0f02c202f40aad831554e6-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Diary-project-headers.hmap -Xcc -I/Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/DerivedSources-normal/arm64 -Xcc -I/Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/DerivedSources/arm64 -Xcc -I/Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Objects-normal/arm64/Diary-Swift.h -working-directory /Users/gunan/workspace/Diary -experimental-emit-module-separately -disable-cmo
+
+SwiftCompile normal arm64 Compiling\ TrendsSummaryView.swift /Users/gunan/workspace/Diary/Diary/Views/TrendsViews/TrendsSummaryView.swift (in target 'Diary' from project 'Diary')
+Failed frontend command:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend -frontend -c /Users/gunan/workspace/Diary/Diary/schema/Diary.swift /Users/gunan/workspace/Diary/Diary/schema/Entry.swift /Users/gunan/workspace/Diary/Diary/schema/Field.swift /Users/gunan/workspace/Diary/Diary/schema/SampleDiaryList.swift -primary-file /Users/gunan/workspace/Diary/Diary/Views/TrendsViews/TrendsSummaryView.swift /Users/gunan/workspace/Diary/Diary/Views/CreateDiaryView.swift /Users/gunan/workspace/Diary/Diary/Views/CreateEntryView.swift /Users/gunan/workspace/Diary/Diary/Views/DiaryListView.swift /Users/gunan/workspace/Diary/Diary/Views/EditFieldModal.swift /Users/gunan/workspace/Diary/Diary/Views/EntryListView.swift /Users/gunan/workspace/Diary/Diary/Views/ShowDiaryView.swift /Users/gunan/workspace/Diary/Diary/Views/ShowEntryView.swift /Users/gunan/workspace/Diary/Diary/Views/ShowTrendsView.swift /Users/gunan/workspace/Diary/Diary/DiaryApp.swift /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/DerivedSources/GeneratedAssetSymbols.swift -emit-dependencies-path /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Objects-normal/arm64/TrendsSummaryView.d -emit-const-values-path /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Objects-normal/arm64/TrendsSummaryView.swiftconstvalues -emit-reference-dependencies-path /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Objects-normal/arm64/TrendsSummaryView.swiftdeps -serialize-diagnostics-path /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Objects-normal/arm64/TrendsSummaryView.dia -emit-localized-strings -emit-localized-strings-path /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Objects-normal/arm64 -target arm64-apple-ios18.2-simulator -module-can-import-version DeveloperToolsSupport 23.0.4 23.0.4 -module-can-import-version SwiftUI 7.0.84.1 7.0.84 -module-can-import-version UIKit 9088.1.113 9088.1.113 -disable-cross-import-overlay-search -swift-module-cross-import SwiftData /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk/System/Library/Frameworks/SwiftData.framework/Modules/SwiftData.swiftcrossimport/CoreData.swiftoverlay -swift-module-cross-import SwiftData /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk/System/Library/Frameworks/SwiftData.framework/Modules/SwiftData.swiftcrossimport/SwiftUI.swiftoverlay -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libFoundationMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#FoundationMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libObservationMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#ObservationMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libPreviewsMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#PreviewsMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftDataMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftDataMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftUIMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftUIMacros -disable-implicit-swift-modules -Xcc -fno-implicit-modules -Xcc -fno-implicit-module-maps -explicit-swift-module-map-file /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Objects-normal/arm64/Diary-dependencies-1.json -Xllvm -aarch64-use-tbi -enable-objc-interop -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -I /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Products/Debug-iphonesimulator -F /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Products/Debug-iphonesimulator -no-color-diagnostics -Xcc -fno-color-diagnostics -enable-testing -g -debug-info-format\=dwarf -dwarf-version\=5 -module-cache-path /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -profile-generate -profile-coverage-mapping -swift-version 5 -enforce-exclusivity\=checked -Onone -D DEBUG -serialize-debugging-options -const-gather-protocols-file /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Objects-normal/arm64/Diary_const_extract_protocols.json -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -empty-abi-descriptor -validate-clang-modules-once -clang-build-session-file /Users/gunan/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -working-directory -Xcc /Users/gunan/workspace/Diary -enable-anonymous-context-mangled-names -file-compilation-dir /Users/gunan/workspace/Diary -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -Xcc -ivfsstatcache -Xcc /Users/gunan/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.0-23A339-26257891a6c027eb51374368541b8346.sdkstatcache -Xcc -I/Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/swift-overrides.hmap -Xcc -iquote -Xcc /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Diary-generated-files.hmap -Xcc -I/Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Diary-own-target-headers.hmap -Xcc -I/Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Diary-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary-972586b2ba0f02c202f40aad831554e6-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Diary-project-headers.hmap -Xcc -I/Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/DerivedSources-normal/arm64 -Xcc -I/Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/DerivedSources/arm64 -Xcc -I/Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/DerivedSources -Xcc -DDEBUG\=1 -no-auto-bridging-header-chaining -module-name Diary -frontend-parseable-output -disable-clang-spi -target-sdk-version 26.0 -target-sdk-name iphonesimulator26.0 -clang-target arm64-apple-ios26.0-simulator -in-process-plugin-server-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/libSwiftInProcPluginServer.dylib -o /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Build/Intermediates.noindex/Diary.build/Debug-iphonesimulator/Diary.build/Objects-normal/arm64/TrendsSummaryView.o -index-unit-output-path /Diary.build/Debug-iphonesimulator/Diary.build/Objects-normal/arm64/TrendsSummaryView.o -index-store-path /Users/gunan/Library/Developer/Xcode/DerivedData/Diary-egzsviwpzbftxbfnxrnhgyuddmgx/Index.noindex/DataStore -index-system-modules
+
+SwiftCompile normal arm64 /Users/gunan/workspace/Diary/Diary/Views/TrendsViews/TrendsSummaryView.swift (in target 'Diary' from project 'Diary')
+    cd /Users/gunan/workspace/Diary
+    
+/Users/gunan/workspace/Diary/Diary/Views/TrendsViews/TrendsSummaryView.swift:23:75: error: value of type 'Entry' has no member 'getFieldValue'
+                Text("Unique values: \(diary.getEntries().compactMap { $0.getFieldValue(selectedField) }.map { "\($0)" }.removingDuplicates().count)")
+                                                                       ~~ ^~~~~~~~~~~~~
+/Users/gunan/workspace/Diary/Diary/Views/TrendsViews/TrendsSummaryView.swift:23:122: error: value of type '[String]' has no member 'removingDuplicates'
+                Text("Unique values: \(diary.getEntries().compactMap { $0.getFieldValue(selectedField) }.map { "\($0)" }.removingDuplicates().count)")
+                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~~~~~~~~~~~~~~~~~
+/Users/gunan/workspace/Diary/Diary/Views/TrendsViews/TrendsSummaryView.swift:23:110: error: cannot infer type of closure parameter '$0' without a type annotation
+                Text("Unique values: \(diary.getEntries().compactMap { $0.getFieldValue(selectedField) }.map { "\($0)" }.removingDuplicates().count)")
+                                                                                                             ^
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ Diary (in target 'Diary' from project 'Diary')
+EmitSwiftModule normal arm64 (in target 'Diary' from project 'Diary')
+    cd /Users/gunan/workspace/Diary
+    
+
+** BUILD FAILED **
+
+
+The following build commands failed:
+	SwiftCompile normal arm64 Compiling\ TrendsSummaryView.swift /Users/gunan/workspace/Diary/Diary/Views/TrendsViews/TrendsSummaryView.swift (in target 'Diary' from project 'Diary')
+	SwiftCompile normal arm64 /Users/gunan/workspace/Diary/Diary/Views/TrendsViews/TrendsSummaryView.swift (in target 'Diary' from project 'Diary')
+	Building project Diary with scheme Diary
+(3 failures)

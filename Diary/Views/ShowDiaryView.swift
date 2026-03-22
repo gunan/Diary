@@ -31,6 +31,9 @@ struct ShowDiaryView: View {
                         }
                     }
                 }
+                Tab("Charts", systemImage: "chart.bar.doc.horizontal") {
+                    ChartsView(diary: diary)
+                }
             }
             .navigationTitle($diary.name)
             .listStyle(InsetGroupedListStyle())
