@@ -26,6 +26,19 @@ struct EditFieldModal: View {
                     }
                 }
                 
+                if editingField.type == FieldType.numeric.toInt() {
+                    HStack {
+                        Text("Min Value: ")
+                        TextField("Optional", value: $editingField.minVal, format: .number)
+                            .keyboardType(.decimalPad)
+                    }
+                    HStack {
+                        Text("Max Value: ")
+                        TextField("Optional", value: $editingField.maxVal, format: .number)
+                            .keyboardType(.decimalPad)
+                    }
+                }
+                
                 if (FieldType.isSelector(editingField.type)) {
                     ForEach(editingField.options, id: \.self) { selection in
                         Text(selection)

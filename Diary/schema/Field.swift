@@ -13,6 +13,7 @@ enum FieldType: CaseIterable, Identifiable {
     case selector
     case time
     case date
+    case numeric
     
     static func fromint(_ val: Int) -> FieldType {
         switch val {
@@ -24,6 +25,8 @@ enum FieldType: CaseIterable, Identifiable {
             return .time
         case 3:
             return .date
+        case 4:
+            return .numeric
         default:
             return .custom
         }
@@ -41,11 +44,13 @@ enum FieldType: CaseIterable, Identifiable {
             return 2
         case .date:
             return 3
+        case .numeric:
+            return 4
         }
     }
     
     static func types() -> [String] {
-        return ["custom", "selector", "time", "date"]
+        return ["custom", "selector", "time", "date", "numeric"]
     }
     
     func toString() -> String {
@@ -74,17 +79,23 @@ class FieldDef: Codable {
     var name: String
     var type: Int = 0
     var options: [String] = []
+    var minVal: Double?
+    var maxVal: Double?
     
     enum CodingKeys: String, CodingKey {
         case name
         case type
         case options
+        case minVal
+        case maxVal
     }
     
     init(_ from: FieldDef) {
         self.name = from.name
         self.type = from.type
         self.options = from.options
+        self.minVal = from.minVal
+        self.maxVal = from.maxVal
     }
     
     init(_ name: String, _ fieldType: FieldType = FieldType.custom) {
@@ -97,6 +108,8 @@ class FieldDef: Codable {
         self.name = try container.decode(String.self, forKey: .name)
         self.type = try container.decode(Int.self, forKey: .type)
         self.options = try container.decode([String].self, forKey: .options)
+        self.minVal = try container.decodeIfPresent(Double.self, forKey: .minVal)
+        self.maxVal = try container.decodeIfPresent(Double.self, forKey: .maxVal)
     }
     
     func encode(to encoder: Encoder) throws {
@@ -104,6 +117,8 @@ class FieldDef: Codable {
         try container.encode(name, forKey: .name)
         try container.encode(type, forKey: .type)
         try container.encode(options, forKey: .options)
+        try container.encodeIfPresent(minVal, forKey: .minVal)
+        try container.encodeIfPresent(maxVal, forKey: .maxVal)
     }
     
     func getName() -> String {

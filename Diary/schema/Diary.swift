@@ -96,6 +96,11 @@ extension Diary {
         
         entryDef.addNewField("time", FieldType.time)
         
+        let numericField: FieldDef = FieldDef("rating", FieldType.numeric)
+        numericField.minVal = 1.0
+        numericField.maxVal = 10.0
+        entryDef.setField("rating", numericField)
+        
         var diary: Diary =  Diary(name: "Sample Diary", schema: entryDef)
 
         let fixedFormatter = DateFormatter()
@@ -114,6 +119,7 @@ extension Diary {
              "Summary":" World",
              "date": Calendar.current.date(from:DateComponents(year: 2024, month: 12, day: 14)),
              "tags": "medicine",
+             "rating": 8.5,
              "time": Calendar.current.date(from:DateComponents(hour: 4, minute: 30))])
         diary.addEntry(
             fixedFormatter.date(from: "2024-12-15")!,
@@ -121,6 +127,7 @@ extension Diary {
              "Summary":" World",
              "date": Calendar.current.date(from:DateComponents.init(year: 2024, month: 12, day: 15)),
              "tags": "work",
+             "rating": 9.2,
              "time": Calendar.current.date(from:DateComponents(hour: 6, minute: 30))])
         
         return diary

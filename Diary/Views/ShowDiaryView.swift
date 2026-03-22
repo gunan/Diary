@@ -31,8 +31,12 @@ struct ShowDiaryView: View {
                         }
                     }
                 }
-                Tab("Charts", systemImage: "chart.bar.doc.horizontal") {
-                    ChartsView(diary: diary)
+                Section(header: Text("Reports")) {
+                    NavigationLink {
+                        ChartsView(diary: diary)
+                    } label: {
+                        Label("Charts", systemImage: "chart.bar.doc.horizontal")
+                    }
                 }
             }
             .navigationTitle($diary.name)

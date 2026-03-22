@@ -50,6 +50,9 @@ struct CreateEntryView: View {
                                         Text(option)
                                     }
                             }
+                        case FieldType.numeric:
+                            TextField("Enter numeric value", value: numericBinding(for: key), format: .number)
+                                .keyboardType(.decimalPad)
                         default:
                             Text("Invalid Field Type")
                         }
@@ -92,6 +95,19 @@ struct CreateEntryView: View {
             },
             set: { newValue in
                 self.entry.setDateField(name: name, value: newValue)
+            }
+        )
+    }
+    
+    private func numericBinding(for name: String) -> Binding<Double?> {
+        return Binding<Double?>(
+            get: {
+                return self.entry.getField(name: name) as? Double
+            },
+            set: { newValue in
+                if let val = newValue {
+                    self.entry.setField(name: name, value: val)
+                }
             }
         )
     }

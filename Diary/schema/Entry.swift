@@ -70,6 +70,7 @@ class Entry: Codable {
     var date: Date
     var dateTimeFields: Dictionary<String, Date> = [:]
     var textFields: Dictionary<String, String> = [:]
+    var numericFields: Dictionary<String, Double> = [:]
     
     static var dateFormatter: DateFormatter = {
         var dateFormatter = DateFormatter()
@@ -117,6 +118,14 @@ class Entry: Codable {
     func setField(name: String, value: Any) {
         if self.def.getFieldType(name)!.isDateTime() {
             self.dateTimeFields[name] = value as? Date
+        } else if self.def.getFieldType(name) == .numeric {
+            if let dblVal = value as? Double {
+                self.numericFields[name] = dblVal
+            } else if let strVal = value as? String, let dblVal = Double(strVal) {
+                self.numericFields[name] = dblVal
+            } else if let intVal = value as? Int {
+                self.numericFields[name] = Double(intVal)
+            }
         } else {
             self.textFields[name] = value as? String ?? ""
         }
@@ -139,6 +148,8 @@ class Entry: Codable {
     func getField(name: String) -> Any {
         if self.def.getFieldType(name)!.isDateTime() {
             return self.dateTimeFields[name] as Any;
+        } else if self.def.getFieldType(name) == .numeric {
+            return self.numericFields[name] as Any;
         } else {
             return self.textFields[name] as Any;
         }
@@ -152,6 +163,12 @@ class Entry: Codable {
                 return Entry.formatDate(self.dateTimeFields[name]);
             } else if self.def.getFieldType(name) == FieldType.time {
                 return Entry.formatTime(self.dateTimeFields[name]);
+            } else if self.def.getFieldType(name) == FieldType.numeric {
+                if let val = self.numericFields[name] {
+                    return String(val)
+                } else {
+                    return ""
+                }
             } else {
                 return self.textFields[name] ?? "";
             }
@@ -163,6 +180,7 @@ class Entry: Codable {
         case date
         case dateTimeFields
         case textFields
+        case numericFields
     }
     
     required init(from decoder: any Decoder) throws {
@@ -171,6 +189,7 @@ class Entry: Codable {
         self.date = try container.decode(Date.self, forKey: .date)
         self.dateTimeFields = try container.decode(Dictionary.self, forKey: .dateTimeFields)
         self.textFields = try container.decode(Dictionary.self, forKey: .textFields)
+        self.numericFields = try container.decodeIfPresent(Dictionary.self, forKey: .numericFields) ?? [:]
     }
     
     func encode(to encoder: Encoder) throws {
@@ -179,5 +198,6 @@ class Entry: Codable {
         try container.encode(date, forKey: .date)
         try container.encode(dateTimeFields, forKey: .dateTimeFields)
         try container.encode(textFields, forKey: .textFields)
+        try container.encode(numericFields, forKey: .numericFields)
     }
 }
