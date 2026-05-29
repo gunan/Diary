@@ -12,5 +12,10 @@ final class PersonalTrackerFlowTests: XCTestCase {
         app.launch()
 
         XCTAssertTrue(app.staticTexts["Mood Tracker"].waitForExistence(timeout: 5))
+        app.staticTexts["Mood Tracker"].tap()
+
+        XCTAssertTrue(app.navigationBars["Mood Tracker"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["New Entry"].exists)
+        XCTAssertTrue(app.buttons["Insights"].exists)
     }
 }
