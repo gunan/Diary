@@ -72,11 +72,16 @@ struct FieldSnapshot: Identifiable, Hashable, Codable {
     var sortOrder: Int
 }
 
+struct TimeOfDay: Hashable, Codable {
+    var hour: Int
+    var minute: Int
+}
+
 enum EntryValue: Hashable, Codable {
     case text(String)
     case number(Double)
     case date(Date)
-    case time(DateComponents)
+    case time(TimeOfDay)
     case selector(String)
     case unavailable(String)
 
@@ -88,10 +93,8 @@ enum EntryValue: Hashable, Codable {
             return String(value)
         case .date(let value):
             return EntryValueFormatters.date.string(from: value)
-        case .time(let components):
-            let hour = components.hour ?? 0
-            let minute = components.minute ?? 0
-            return String(format: "%02d:%02d", hour, minute)
+        case .time(let value):
+            return String(format: "%02d:%02d", value.hour, value.minute)
         case .unavailable(let reason):
             return reason
         }
@@ -102,6 +105,8 @@ enum EntryValueFormatters {
     static let date: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter
     }()
@@ -120,7 +125,12 @@ struct TrackerEntry: Identifiable, Hashable, Codable {
 
     func displayRows() -> [EntryDisplayRow] {
         fieldSnapshots
-            .sorted { $0.sortOrder < $1.sortOrder }
+            .sorted {
+                if $0.sortOrder == $1.sortOrder {
+                    return $0.id.rawValue.uuidString < $1.id.rawValue.uuidString
+                }
+                return $0.sortOrder < $1.sortOrder
+            }
             .map { snapshot in
                 EntryDisplayRow(
                     label: snapshot.name,
@@ -138,9 +148,9 @@ struct Tracker: Identifiable, Hashable, Codable {
     var createdAt: Date
     var updatedAt: Date
 
-    mutating func renameField(id: FieldID, to name: String) {
+    mutating func renameField(id: FieldID, to name: String, updatedAt: Date = Date()) {
         guard let index = fields.firstIndex(where: { $0.id == id }) else { return }
         fields[index].name = name
-        updatedAt = Date()
+        self.updatedAt = updatedAt
     }
 }
