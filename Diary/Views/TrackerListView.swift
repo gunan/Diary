@@ -73,5 +73,77 @@ struct TrackerEditorView: View {
 
 #Preview {
     TrackerListView()
-        .modelContainer(SampleDiaryList.shared.modelContainer)
+        .modelContainer(TrackerPreviewData.container)
+}
+
+@MainActor
+enum TrackerPreviewData {
+    static let trackerID = TrackerID(UUID(uuidString: "7B7F0DE6-6F23-43C7-93AE-9173AFAE9B7E")!)
+
+    static let container: ModelContainer = {
+        do {
+            let container = try ModelContainerFactory.makeTestingContainer()
+            let context = container.mainContext
+            let moodFieldID = UUID(uuidString: "2C3B5C3E-B98E-4BB7-A5F4-91CC99A76D4C")!
+            let noteFieldID = UUID(uuidString: "FD8D29E6-76D1-493D-8EDB-633D52B4070F")!
+            let tracker = TrackerModel(
+                trackerID: trackerID.rawValue,
+                name: "Mood Tracker",
+                createdAt: Date(timeIntervalSince1970: 1_724_000_000),
+                updatedAt: Date(timeIntervalSince1970: 1_724_003_600),
+                fields: [
+                    FieldDefinitionModel(
+                        fieldID: moodFieldID,
+                        name: "Mood",
+                        typeRaw: TrackerFieldType.selector.rawValue,
+                        sortOrder: 0,
+                        options: ["Calm", "Focused", "Tired"]
+                    ),
+                    FieldDefinitionModel(
+                        fieldID: noteFieldID,
+                        name: "Note",
+                        typeRaw: TrackerFieldType.text.rawValue,
+                        sortOrder: 1
+                    ),
+                ],
+                entries: [
+                    EntryModel(
+                        createdAt: Date(timeIntervalSince1970: 1_724_003_600),
+                        values: [
+                            EntryValueModel(
+                                fieldID: moodFieldID,
+                                typeRaw: TrackerFieldType.selector.rawValue,
+                                textValue: "Focused"
+                            ),
+                            EntryValueModel(
+                                fieldID: noteFieldID,
+                                typeRaw: TrackerFieldType.text.rawValue,
+                                textValue: "Planning the day"
+                            ),
+                        ],
+                        snapshots: [
+                            FieldSnapshotModel(
+                                fieldID: moodFieldID,
+                                name: "Mood",
+                                typeRaw: TrackerFieldType.selector.rawValue,
+                                sortOrder: 0
+                            ),
+                            FieldSnapshotModel(
+                                fieldID: noteFieldID,
+                                name: "Note",
+                                typeRaw: TrackerFieldType.text.rawValue,
+                                sortOrder: 1
+                            ),
+                        ]
+                    ),
+                ]
+            )
+
+            context.insert(tracker)
+            try context.save()
+            return container
+        } catch {
+            fatalError("Could not create tracker preview container: \(error)")
+        }
+    }()
 }

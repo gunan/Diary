@@ -56,7 +56,12 @@ private struct TrackerDetailContent: View {
         List {
             Section {
                 HStack(spacing: 12) {
-                    Button {
+                    NavigationLink {
+                        TrackerPlaceholderDestination(
+                            title: "New Entry",
+                            systemImage: "plus.circle",
+                            message: "Entry creation is coming in the next tracker task."
+                        )
                     } label: {
                         Label("New Entry", systemImage: "plus.circle.fill")
                             .frame(maxWidth: .infinity)
@@ -64,7 +69,12 @@ private struct TrackerDetailContent: View {
                     .buttonStyle(.borderedProminent)
                     .accessibilityIdentifier("new-entry-button")
 
-                    Button {
+                    NavigationLink {
+                        TrackerPlaceholderDestination(
+                            title: "Insights",
+                            systemImage: "chart.line.uptrend.xyaxis",
+                            message: "Tracker insights are coming after entries are wired up."
+                        )
                     } label: {
                         Label("Insights", systemImage: "chart.line.uptrend.xyaxis")
                             .frame(maxWidth: .infinity)
@@ -109,9 +119,25 @@ private struct TrackerDetailContent: View {
     }
 }
 
+private struct TrackerPlaceholderDestination: View {
+    let title: String
+    let systemImage: String
+    let message: String
+
+    var body: some View {
+        ContentUnavailableView(
+            title,
+            systemImage: systemImage,
+            description: Text(message)
+        )
+        .navigationTitle(title)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
 #Preview {
     NavigationStack {
-        TrackerDetailView(trackerID: TrackerID())
+        TrackerDetailView(trackerID: TrackerPreviewData.trackerID)
     }
-    .modelContainer(SampleDiaryList.shared.modelContainer)
+    .modelContainer(TrackerPreviewData.container)
 }
