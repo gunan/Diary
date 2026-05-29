@@ -4,6 +4,7 @@ import SwiftData
 @MainActor
 enum TrackerRepositoryError: Error, Equatable {
     case trackerNotFound
+    case unknownField(FieldID)
 }
 
 @MainActor
@@ -48,6 +49,11 @@ final class TrackerRepository {
         let trackerModel = try requireTrackerModel(id: trackerID)
         let sortedFields = trackerModel.fields.sorted { $0.sortOrder < $1.sortOrder }
         let domainFields = sortedFields.map(Self.domainField(from:))
+        let knownFieldIDs = Set(domainFields.map(\.id))
+
+        for fieldID in values.keys where !knownFieldIDs.contains(fieldID) {
+            throw TrackerRepositoryError.unknownField(fieldID)
+        }
 
         for field in domainFields {
             if let value = values[field.id], let error = TrackerValidator.validate(value: value, for: field) {
@@ -111,7 +117,16 @@ private extension TrackerRepository {
     }
 
     static func domainEntry(from model: EntryModel) -> TrackerEntry {
-        TrackerEntry(
+        let values = model.values
+            .sorted { $0.valueID.uuidString < $1.valueID.uuidString }
+            .reduce(into: [FieldID: EntryValue]()) { partialResult, valueModel in
+                let fieldID = FieldID(valueModel.fieldID)
+                if partialResult[fieldID] == nil {
+                    partialResult[fieldID] = domainValue(from: valueModel)
+                }
+            }
+
+        return TrackerEntry(
             id: EntryID(model.entryID),
             createdAt: model.createdAt,
             fieldSnapshots: model.snapshots.map {
@@ -123,9 +138,7 @@ private extension TrackerRepository {
                 )
             }
             .sorted { $0.sortOrder < $1.sortOrder },
-            values: Dictionary(uniqueKeysWithValues: model.values.map {
-                (FieldID($0.fieldID), domainValue(from: $0))
-            })
+            values: values
         )
     }
 
@@ -144,7 +157,15 @@ private extension TrackerRepository {
         case .date:
             return .date(model.dateValue ?? Date(timeIntervalSince1970: 0))
         case .time:
-            return .time(TimeOfDay(hour: model.timeHour ?? 0, minute: model.timeMinute ?? 0))
+            guard
+                let hour = model.timeHour,
+                let minute = model.timeMinute,
+                (0...23).contains(hour),
+                (0...59).contains(minute)
+            else {
+                return .unavailable("Invalid time")
+            }
+            return .time(TimeOfDay(hour: hour, minute: minute))
         }
     }
 

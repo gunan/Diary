@@ -115,4 +115,148 @@ struct TrackerRepositoryTests {
             try repository.createEntry(trackerID: TrackerID(), values: [:])
         }
     }
+
+    @Test func unknownFieldIDThrowsUnknownField() throws {
+        let container = try ModelContainerFactory.makeTestingContainer()
+        let repository = TrackerRepository(context: container.mainContext)
+        let tracker = try repository.createTracker(TrackerDraft(
+            name: "Mood Tracker",
+            fields: [
+                TrackerFieldDraft(name: "Energy", type: .number, sortOrder: 0),
+            ]
+        ))
+        let unknownFieldID = FieldID()
+
+        #expect(throws: TrackerRepositoryError.unknownField(unknownFieldID)) {
+            try repository.createEntry(
+                trackerID: tracker.id,
+                values: [unknownFieldID: .number(8)]
+            )
+        }
+    }
+
+    @Test func partialEntryValuesDisplayAsBlanks() throws {
+        let container = try ModelContainerFactory.makeTestingContainer()
+        let repository = TrackerRepository(context: container.mainContext)
+        let tracker = try repository.createTracker(TrackerDraft(
+            name: "Mood Tracker",
+            fields: [
+                TrackerFieldDraft(name: "Mood", type: .text, sortOrder: 0),
+                TrackerFieldDraft(name: "Energy", type: .number, sortOrder: 1),
+            ]
+        ))
+
+        let entry = try repository.createEntry(
+            trackerID: tracker.id,
+            values: [tracker.fields[0].id: .text("Steady")]
+        )
+
+        #expect(entry.displayRows() == [
+            EntryDisplayRow(label: "Mood", value: "Steady"),
+            EntryDisplayRow(label: "Energy", value: ""),
+        ])
+    }
+
+    @Test func duplicatePersistedValueRowsDoNotCrashMapping() throws {
+        let container = try ModelContainerFactory.makeTestingContainer()
+        let repository = TrackerRepository(context: container.mainContext)
+        let fieldID = UUID()
+        let tracker = TrackerModel(
+            name: "Mood Tracker",
+            fields: [
+                FieldDefinitionModel(
+                    fieldID: fieldID,
+                    name: "Mood",
+                    typeRaw: TrackerFieldType.text.rawValue,
+                    sortOrder: 0
+                ),
+            ],
+            entries: [
+                EntryModel(
+                    values: [
+                        EntryValueModel(
+                            valueID: UUID(uuidString: "00000000-0000-0000-0000-000000000001")!,
+                            fieldID: fieldID,
+                            typeRaw: TrackerFieldType.text.rawValue,
+                            textValue: "First"
+                        ),
+                        EntryValueModel(
+                            valueID: UUID(uuidString: "00000000-0000-0000-0000-000000000002")!,
+                            fieldID: fieldID,
+                            typeRaw: TrackerFieldType.text.rawValue,
+                            textValue: "Second"
+                        ),
+                    ],
+                    snapshots: [
+                        FieldSnapshotModel(
+                            fieldID: fieldID,
+                            name: "Mood",
+                            typeRaw: TrackerFieldType.text.rawValue,
+                            sortOrder: 0
+                        ),
+                    ]
+                ),
+            ]
+        )
+        container.mainContext.insert(tracker)
+        try container.mainContext.save()
+
+        let mappedTracker = try #require(try repository.fetchTrackers().first)
+        let entry = try #require(mappedTracker.entries.first)
+
+        #expect(entry.values[FieldID(fieldID)] == .text("First"))
+    }
+
+    @Test func invalidPersistedTimeMapsToUnavailable() throws {
+        let container = try ModelContainerFactory.makeTestingContainer()
+        let repository = TrackerRepository(context: container.mainContext)
+        let fieldID = UUID()
+        let tracker = TrackerModel(
+            name: "Routine Tracker",
+            entries: [
+                EntryModel(
+                    values: [
+                        EntryValueModel(
+                            fieldID: fieldID,
+                            typeRaw: TrackerFieldType.time.rawValue,
+                            timeHour: 25,
+                            timeMinute: 0
+                        ),
+                    ]
+                ),
+            ]
+        )
+        container.mainContext.insert(tracker)
+        try container.mainContext.save()
+
+        let entry = try #require(try repository.fetchTrackers().first?.entries.first)
+
+        #expect(entry.values[FieldID(fieldID)] == .unavailable("Invalid time"))
+    }
+
+    @Test func incompletePersistedTimeMapsToUnavailable() throws {
+        let container = try ModelContainerFactory.makeTestingContainer()
+        let repository = TrackerRepository(context: container.mainContext)
+        let fieldID = UUID()
+        let tracker = TrackerModel(
+            name: "Routine Tracker",
+            entries: [
+                EntryModel(
+                    values: [
+                        EntryValueModel(
+                            fieldID: fieldID,
+                            typeRaw: TrackerFieldType.time.rawValue,
+                            timeHour: 6
+                        ),
+                    ]
+                ),
+            ]
+        )
+        container.mainContext.insert(tracker)
+        try container.mainContext.save()
+
+        let entry = try #require(try repository.fetchTrackers().first?.entries.first)
+
+        #expect(entry.values[FieldID(fieldID)] == .unavailable("Invalid time"))
+    }
 }
