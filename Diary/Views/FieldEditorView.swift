@@ -10,6 +10,7 @@ struct FieldEditorView: View {
     @State private var fieldName = ""
     @State private var selectedType: TrackerFieldType = .text
     @State private var selectorOptions = [SelectorOptionDraft(text: "")]
+    @State private var validationMessages: [String] = []
 
     var body: some View {
         NavigationStack {
@@ -51,6 +52,15 @@ struct FieldEditorView: View {
                         }
                     }
                 }
+
+                if !validationMessages.isEmpty {
+                    Section {
+                        ForEach(validationMessages, id: \.self) { message in
+                            Text(message)
+                                .foregroundStyle(.red)
+                        }
+                    }
+                }
             }
             .navigationTitle("New Field")
             .navigationBarTitleDisplayMode(.inline)
@@ -72,16 +82,50 @@ struct FieldEditorView: View {
     }
 
     private func saveField() {
+        let trimmedName = fieldName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let options = selectorOptions.map { $0.text.trimmingCharacters(in: .whitespacesAndNewlines) }
+        let messages = validationMessages(fieldName: trimmedName, options: options)
+
+        guard messages.isEmpty else {
+            validationMessages = messages
+            return
+        }
+
         onSave(
             TrackerFieldDraft(
                 id: fieldID,
-                name: fieldName,
+                name: trimmedName,
                 type: selectedType,
                 sortOrder: sortOrder,
-                options: selectedType == .selector ? selectorOptions.map(\.text) : []
+                options: selectedType == .selector ? options : []
             )
         )
         dismiss()
+    }
+
+    private func validationMessages(fieldName: String, options: [String]) -> [String] {
+        var messages: [String] = []
+
+        if fieldName.isEmpty {
+            messages.append(TrackerValidationError.emptyFieldName.localizedDescription)
+        }
+
+        if selectedType == .selector {
+            let messageFieldName = fieldName.isEmpty ? "Selector field" : fieldName
+            if options.contains(where: \.isEmpty) {
+                messages.append(
+                    TrackerValidationError.emptySelectorOption(fieldName: messageFieldName).localizedDescription
+                )
+            }
+
+            if options.allSatisfy(\.isEmpty) {
+                messages.append(
+                    TrackerValidationError.selectorWithoutOptions(fieldName: messageFieldName).localizedDescription
+                )
+            }
+        }
+
+        return messages
     }
 }
 
