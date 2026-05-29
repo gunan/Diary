@@ -144,14 +144,11 @@ struct EntryEditorView: View {
             case .number:
                 let numberText = numberValues[field.id]?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
                 if !numberText.isEmpty {
-                    guard let number = Double(numberText) else {
-                        throw EntryEditorError.invalidNumber(field.name)
-                    }
-                    values[field.id] = .number(number)
+                    values[field.id] = try .number(EntryEditorValueNormalizer.numberValue(from: numberText, fieldName: field.name))
                 }
             case .date:
                 if let date = dateValues[field.id] {
-                    values[field.id] = .date(date)
+                    values[field.id] = .date(EntryEditorValueNormalizer.dateValue(from: date, calendar: calendar))
                 }
             case .time:
                 if let date = timeValues[field.id] {
@@ -211,7 +208,23 @@ struct EntryEditorView: View {
     }
 }
 
-private enum EntryEditorError: LocalizedError {
+enum EntryEditorValueNormalizer {
+    static func dateValue(from date: Date, calendar: Calendar = .current) -> Date {
+        let components = calendar.dateComponents([.year, .month, .day], from: date)
+        var utcCalendar = Calendar(identifier: .gregorian)
+        utcCalendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        return utcCalendar.date(from: components) ?? date
+    }
+
+    static func numberValue(from text: String, fieldName: String) throws -> Double {
+        guard let number = Double(text), number.isFinite else {
+            throw EntryEditorError.invalidNumber(fieldName)
+        }
+        return number
+    }
+}
+
+enum EntryEditorError: LocalizedError, Equatable {
     case invalidNumber(String)
 
     var errorDescription: String? {
