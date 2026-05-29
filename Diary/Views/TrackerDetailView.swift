@@ -39,6 +39,8 @@ struct TrackerDetailView: View {
 private struct TrackerDetailContent: View {
     let tracker: TrackerModel
 
+    @State private var isShowingEntryEditor = false
+
     private var sortedFields: [FieldDefinitionModel] {
         tracker.fields.sorted {
             if $0.sortOrder == $1.sortOrder {
@@ -56,12 +58,8 @@ private struct TrackerDetailContent: View {
         List {
             Section {
                 HStack(spacing: 12) {
-                    NavigationLink {
-                        TrackerPlaceholderDestination(
-                            title: "New Entry",
-                            systemImage: "plus.circle",
-                            message: "Entry creation is coming in the next tracker task."
-                        )
+                    Button {
+                        isShowingEntryEditor = true
                     } label: {
                         Label("New Entry", systemImage: "plus.circle.fill")
                             .frame(maxWidth: .infinity)
@@ -111,10 +109,17 @@ private struct TrackerDetailContent: View {
             } else {
                 Section("Recent Entries") {
                     ForEach(recentEntries) { entry in
-                        Text(entry.createdAt, format: .dateTime.month().day().year().hour().minute())
+                        NavigationLink {
+                            EntryDetailView(entry: entry)
+                        } label: {
+                            Text(entry.createdAt, format: .dateTime.month().day().year().hour().minute())
+                        }
                     }
                 }
             }
+        }
+        .navigationDestination(isPresented: $isShowingEntryEditor) {
+            EntryEditorView(tracker: tracker)
         }
     }
 }

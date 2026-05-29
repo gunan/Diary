@@ -45,4 +45,25 @@ final class PersonalTrackerFlowTests: XCTestCase {
 
         XCTAssertTrue(app.staticTexts["Workout"].waitForExistence(timeout: 5))
     }
+
+    @MainActor
+    func testCreatesEntryAndShowsDetail() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-ui-testing", "-seed-sample-data"]
+        app.launch()
+
+        XCTAssertTrue(app.staticTexts["Mood Tracker"].waitForExistence(timeout: 5))
+        app.staticTexts["Mood Tracker"].tap()
+
+        app.buttons["New Entry"].tap()
+
+        let ratingField = app.textFields["entry-number-rating"]
+        XCTAssertTrue(ratingField.waitForExistence(timeout: 5))
+        ratingField.tap()
+        ratingField.typeText("9")
+
+        app.buttons["save-entry-button"].tap()
+
+        XCTAssertTrue(app.staticTexts["9.0"].waitForExistence(timeout: 5))
+    }
 }
