@@ -73,8 +73,49 @@ struct FieldSnapshot: Identifiable, Hashable, Codable {
 }
 
 struct TimeOfDay: Hashable, Codable {
-    var hour: Int
-    var minute: Int
+    private enum CodingKeys: String, CodingKey {
+        case hour
+        case minute
+    }
+
+    private let storedHour: Int
+    private let storedMinute: Int
+
+    var hour: Int { storedHour }
+    var minute: Int { storedMinute }
+
+    init(hour: Int, minute: Int) {
+        precondition(TimeOfDay.isValid(hour: hour, minute: minute), "Invalid time of day")
+        self.storedHour = hour
+        self.storedMinute = minute
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let hour = try container.decode(Int.self, forKey: .hour)
+        let minute = try container.decode(Int.self, forKey: .minute)
+
+        guard TimeOfDay.isValid(hour: hour, minute: minute) else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .hour,
+                in: container,
+                debugDescription: "TimeOfDay hour must be 0...23 and minute must be 0...59."
+            )
+        }
+
+        self.storedHour = hour
+        self.storedMinute = minute
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(hour, forKey: .hour)
+        try container.encode(minute, forKey: .minute)
+    }
+
+    private static func isValid(hour: Int, minute: Int) -> Bool {
+        (0...23).contains(hour) && (0...59).contains(minute)
+    }
 }
 
 enum EntryValue: Hashable, Codable {

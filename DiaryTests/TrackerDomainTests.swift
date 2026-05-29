@@ -67,6 +67,18 @@ struct TrackerDomainTests {
         #expect(value.displayValue == "09:05")
     }
 
+    @Test func invalidTimeOfDayDecodeThrows() {
+        let invalidHourData = Data(#"{"hour":99,"minute":5}"#.utf8)
+        let invalidMinuteData = Data(#"{"hour":9,"minute":-4}"#.utf8)
+
+        #expect(throws: DecodingError.self) {
+            try JSONDecoder().decode(TimeOfDay.self, from: invalidHourData)
+        }
+        #expect(throws: DecodingError.self) {
+            try JSONDecoder().decode(TimeOfDay.self, from: invalidMinuteData)
+        }
+    }
+
     @Test func displayRowsUseStableFieldIDTieBreaker() {
         let laterFieldID = FieldID(UUID(uuidString: "BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB")!)
         let earlierFieldID = FieldID(UUID(uuidString: "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA")!)
