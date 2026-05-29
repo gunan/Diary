@@ -68,11 +68,7 @@ private struct TrackerDetailContent: View {
                     .accessibilityIdentifier("new-entry-button")
 
                     NavigationLink {
-                        TrackerPlaceholderDestination(
-                            title: "Insights",
-                            systemImage: "chart.line.uptrend.xyaxis",
-                            message: "Tracker insights are coming after entries are wired up."
-                        )
+                        TrackerChartsView(tracker: tracker)
                     } label: {
                         Label("Insights", systemImage: "chart.line.uptrend.xyaxis")
                             .frame(maxWidth: .infinity)

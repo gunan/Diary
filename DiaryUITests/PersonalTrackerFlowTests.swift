@@ -20,6 +20,21 @@ final class PersonalTrackerFlowTests: XCTestCase {
     }
 
     @MainActor
+    func testShowsNumericChartControls() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-ui-testing", "-seed-sample-data"]
+        app.launch()
+
+        XCTAssertTrue(app.staticTexts["Mood Tracker"].waitForExistence(timeout: 5))
+        app.staticTexts["Mood Tracker"].tap()
+
+        app.buttons["Insights"].tap()
+
+        XCTAssertTrue(app.switches["chart-field-rating"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.staticTexts["Summary"].exists)
+    }
+
+    @MainActor
     func testCreatesTrackerWithNumberField() throws {
         let app = XCUIApplication()
         app.launchArguments = ["-ui-testing"]
