@@ -4,6 +4,7 @@ import Testing
 @testable import Diary
 
 @MainActor
+@Suite(.serialized)
 struct LegacyDiaryImporterTests {
     @Test func importsLegacyDiaryIntoTrackerModel() throws {
         let container = try ModelContainerFactory.makeTestingContainer()
@@ -102,5 +103,88 @@ struct LegacyDiaryImporterTests {
         #expect(trackerRows.count == 1)
         #expect(trackerRows[0].name == "Mood Tracker")
         #expect(trackerRows[0].entries.count == 2)
+    }
+
+    @Test func missingTextFieldImportsAsUnavailable() throws {
+        let diary = Diary.sampleData()
+        for entry in diary.entries {
+            entry.textFields.removeValue(forKey: "Title")
+        }
+
+        let value = try importedValue(
+            fieldName: "Title",
+            diary: diary
+        )
+
+        #expect(value.textValue == nil)
+        #expect(value.unavailableReason == "Unavailable")
+    }
+
+    @Test func missingSelectorFieldImportsAsUnavailable() throws {
+        let diary = Diary.sampleData()
+        for entry in diary.entries {
+            entry.textFields.removeValue(forKey: "tags")
+        }
+
+        let value = try importedValue(
+            fieldName: "tags",
+            diary: diary
+        )
+
+        #expect(value.textValue == nil)
+        #expect(value.unavailableReason == "Unavailable")
+    }
+
+    @Test func selectorValueOutsideOptionsImportsAsUnavailable() throws {
+        let diary = Diary.sampleData()
+        for entry in diary.entries {
+            entry.textFields["tags"] = "unknown"
+        }
+
+        let value = try importedValue(
+            fieldName: "tags",
+            diary: diary
+        )
+
+        #expect(value.textValue == nil)
+        #expect(value.unavailableReason == "Unavailable")
+    }
+
+    @Test func intentionalEmptyTextStringIsPreserved() throws {
+        let diary = Diary.sampleData()
+        for entry in diary.entries {
+            entry.textFields["Title"] = ""
+        }
+
+        let value = try importedValue(
+            fieldName: "Title",
+            diary: diary
+        )
+
+        #expect(value.textValue == "")
+        #expect(value.unavailableReason == nil)
+    }
+
+    private func importedValue(fieldName: String, diary: Diary) throws -> ImportedValue {
+        let container = try ModelContainerFactory.makeTestingContainer()
+        let context = container.mainContext
+        context.insert(diary)
+        try context.save()
+
+        try LegacyDiaryImporter.importIfNeeded(in: context)
+
+        let tracker = try #require(try context.fetch(FetchDescriptor<TrackerModel>()).first)
+        let fieldID = try #require(tracker.fields.first { $0.name == fieldName }?.fieldID)
+        let entry = try #require(tracker.entries.sorted { $0.createdAt < $1.createdAt }.first)
+        let value = try #require(entry.values.first { $0.fieldID == fieldID })
+        return ImportedValue(
+            textValue: value.textValue,
+            unavailableReason: value.unavailableReason
+        )
+    }
+
+    private struct ImportedValue {
+        var textValue: String?
+        var unavailableReason: String?
     }
 }

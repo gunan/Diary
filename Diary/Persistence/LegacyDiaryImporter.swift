@@ -93,11 +93,28 @@ enum LegacyDiaryImporter {
                 timeHour: hour,
                 timeMinute: minute
             )
-        case .selector, .text:
+        case .text:
+            guard legacyEntry.textFields.keys.contains(field.name) else {
+                return unavailableValue(field: field)
+            }
             return EntryValueModel(
                 fieldID: field.fieldID,
                 typeRaw: field.typeRaw,
                 textValue: legacyEntry.textFields[field.name] ?? ""
+            )
+        case .selector:
+            guard let selectedValue = legacyEntry.textFields[field.name] else {
+                return unavailableValue(field: field)
+            }
+            let trimmedValue = selectedValue.trimmingCharacters(in: .whitespacesAndNewlines)
+            let trimmedOptions = Set(field.options.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) })
+            guard trimmedOptions.contains(trimmedValue) else {
+                return unavailableValue(field: field)
+            }
+            return EntryValueModel(
+                fieldID: field.fieldID,
+                typeRaw: field.typeRaw,
+                textValue: trimmedValue
             )
         }
     }
