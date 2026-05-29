@@ -46,6 +46,11 @@ enum ModelContainerFactory {
             if AppLaunchOptions.shouldSeedSampleData {
                 seedLegacySampleData(in: container.mainContext)
             }
+            do {
+                try LegacyDiaryImporter.importIfNeeded(in: container.mainContext)
+            } catch {
+                fatalError("Could not import legacy diaries: \(error)")
+            }
             return container
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
@@ -61,7 +66,6 @@ enum ModelContainerFactory {
     }
 
     static func seedLegacySampleData(in context: ModelContext) {
-        // Task 6 will import legacy sample data into v2 tracker rows.
         let tracker = Diary.sampleData()
         tracker.name = "Mood Tracker"
         context.insert(tracker)
