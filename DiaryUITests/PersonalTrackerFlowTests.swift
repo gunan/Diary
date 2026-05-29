@@ -18,4 +18,31 @@ final class PersonalTrackerFlowTests: XCTestCase {
         XCTAssertTrue(app.buttons["New Entry"].exists)
         XCTAssertTrue(app.buttons["Insights"].exists)
     }
+
+    @MainActor
+    func testCreatesTrackerWithNumberField() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-ui-testing"]
+        app.launch()
+
+        app.buttons["new-tracker-button"].tap()
+
+        let trackerNameField = app.textFields["tracker-name-field"]
+        XCTAssertTrue(trackerNameField.waitForExistence(timeout: 5))
+        trackerNameField.tap()
+        trackerNameField.typeText("Workout")
+
+        app.buttons["add-field-button"].tap()
+
+        let fieldNameField = app.textFields["field-name-field"]
+        XCTAssertTrue(fieldNameField.waitForExistence(timeout: 5))
+        fieldNameField.tap()
+        fieldNameField.typeText("Distance")
+
+        app.buttons["field-type-number"].tap()
+        app.buttons["save-field-button"].tap()
+        app.buttons["save-tracker-button"].tap()
+
+        XCTAssertTrue(app.staticTexts["Workout"].waitForExistence(timeout: 5))
+    }
 }

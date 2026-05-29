@@ -1,0 +1,112 @@
+import SwiftUI
+
+struct FieldEditorView: View {
+    let sortOrder: Int
+    let onSave: (TrackerFieldDraft) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var fieldID = FieldID()
+    @State private var fieldName = ""
+    @State private var selectedType: TrackerFieldType = .text
+    @State private var selectorOptions = [SelectorOptionDraft(text: "")]
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    TextField("Field Name", text: $fieldName)
+                        .textInputAutocapitalization(.words)
+                        .accessibilityIdentifier("field-name-field")
+                }
+
+                Section("Type") {
+                    ForEach(TrackerFieldType.allCases) { type in
+                        Button {
+                            selectedType = type
+                        } label: {
+                            HStack {
+                                Text(type.displayName)
+                                    .foregroundStyle(.primary)
+                                Spacer()
+                                if selectedType == type {
+                                    Image(systemName: "checkmark")
+                                        .foregroundStyle(AppBrand.accentColor)
+                                }
+                            }
+                        }
+                        .accessibilityIdentifier("field-type-\(type.rawValue)")
+                        .accessibilityAddTraits(selectedType == type ? .isSelected : [])
+                    }
+                }
+
+                if selectedType == .selector {
+                    Section("Options") {
+                        ForEach($selectorOptions) { $option in
+                            TextField("Option", text: $option.text)
+                        }
+
+                        Button("Add Option") {
+                            selectorOptions.append(SelectorOptionDraft(text: ""))
+                        }
+                    }
+                }
+            }
+            .navigationTitle("New Field")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        saveField()
+                    }
+                    .accessibilityIdentifier("save-field-button")
+                }
+            }
+        }
+    }
+
+    private func saveField() {
+        onSave(
+            TrackerFieldDraft(
+                id: fieldID,
+                name: fieldName,
+                type: selectedType,
+                sortOrder: sortOrder,
+                options: selectedType == .selector ? selectorOptions.map(\.text) : []
+            )
+        )
+        dismiss()
+    }
+}
+
+private struct SelectorOptionDraft: Identifiable {
+    let id = UUID()
+    var text: String
+}
+
+private extension TrackerFieldType {
+    var displayName: String {
+        switch self {
+        case .text:
+            return "Text"
+        case .number:
+            return "Number"
+        case .date:
+            return "Date"
+        case .time:
+            return "Time"
+        case .selector:
+            return "Selector"
+        }
+    }
+}
+
+#Preview {
+    FieldEditorView(sortOrder: 0) { _ in }
+}

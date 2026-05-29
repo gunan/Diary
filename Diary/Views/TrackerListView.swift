@@ -60,17 +60,6 @@ private struct TrackerRow: View {
     }
 }
 
-struct TrackerEditorView: View {
-    var body: some View {
-        ContentUnavailableView(
-            "New tracker editor",
-            systemImage: "plus.square.on.square",
-            description: Text("Tracker creation will be added in the next task.")
-        )
-        .navigationTitle("New Tracker")
-    }
-}
-
 #Preview {
     TrackerListView()
         .modelContainer(TrackerPreviewData.container)
