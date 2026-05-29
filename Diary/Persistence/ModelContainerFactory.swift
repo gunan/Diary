@@ -7,7 +7,15 @@ enum AppLaunchOptions {
     }
 
     static var shouldSeedSampleData: Bool {
-        ProcessInfo.processInfo.arguments.contains("-seed-sample-data")
+        isUITesting && ProcessInfo.processInfo.arguments.contains("-seed-sample-data")
+    }
+
+    static var shouldResetStore: Bool {
+        isUITesting && ProcessInfo.processInfo.arguments.contains("-reset-store")
+    }
+
+    static var shouldUseInMemoryStore: Bool {
+        isUITesting || shouldResetStore
     }
 }
 
@@ -22,7 +30,7 @@ enum ModelContainerFactory {
         ])
         let configuration = ModelConfiguration(
             schema: schema,
-            isStoredInMemoryOnly: AppLaunchOptions.isUITesting
+            isStoredInMemoryOnly: AppLaunchOptions.shouldUseInMemoryStore
         )
 
         do {
