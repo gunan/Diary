@@ -61,6 +61,7 @@ enum ModelContainerFactory {
     }
 
     static func seedLegacySampleData(in context: ModelContext) {
+        // Task 6 will import legacy sample data into v2 tracker rows.
         let tracker = Diary.sampleData()
         tracker.name = "Mood Tracker"
         context.insert(tracker)
