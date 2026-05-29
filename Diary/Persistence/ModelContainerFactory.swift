@@ -21,13 +21,21 @@ enum AppLaunchOptions {
 
 @MainActor
 enum ModelContainerFactory {
-    static func makeModelContainer() -> ModelContainer {
-        let schema = Schema([
+    private static var schema: Schema {
+        Schema([
             Diary.self,
             EntryDef.self,
             Entry.self,
             FieldDef.self,
+            TrackerModel.self,
+            FieldDefinitionModel.self,
+            EntryModel.self,
+            EntryValueModel.self,
+            FieldSnapshotModel.self,
         ])
+    }
+
+    static func makeModelContainer() -> ModelContainer {
         let configuration = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: AppLaunchOptions.shouldUseInMemoryStore
@@ -42,6 +50,14 @@ enum ModelContainerFactory {
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
+    }
+
+    static func makeTestingContainer() throws -> ModelContainer {
+        let configuration = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: true
+        )
+        return try ModelContainer(for: schema, configurations: [configuration])
     }
 
     static func seedLegacySampleData(in context: ModelContext) {
