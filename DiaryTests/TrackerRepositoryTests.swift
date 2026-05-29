@@ -40,6 +40,41 @@ struct TrackerRepositoryTests {
         #expect(entry.displayRows()[0].value == "8.0")
     }
 
+    @Test func updatingTrackerKeepsFieldIDsAndExistingEntrySnapshots() throws {
+        let container = try ModelContainerFactory.makeTestingContainer()
+        let repository = TrackerRepository(context: container.mainContext)
+        let tracker = try repository.createTracker(TrackerDraft(
+            name: "Mood Tracker",
+            fields: [
+                TrackerFieldDraft(name: "Rating", type: .number, sortOrder: 0),
+                TrackerFieldDraft(name: "Note", type: .text, sortOrder: 1),
+            ]
+        ))
+        let ratingFieldID = tracker.fields[0].id
+        _ = try repository.createEntry(
+            trackerID: tracker.id,
+            values: [ratingFieldID: .number(8)]
+        )
+
+        let updatedTracker = try repository.updateTracker(
+            id: tracker.id,
+            with: TrackerDraft(
+                name: "Wellness Tracker",
+                fields: [
+                    TrackerFieldDraft(id: tracker.fields[1].id, name: "Note", type: .text, sortOrder: 0),
+                    TrackerFieldDraft(id: ratingFieldID, name: "Score", type: .number, sortOrder: 1),
+                ]
+            )
+        )
+        let fetchedTracker = try #require(try repository.fetchTrackers().first)
+        let entry = try #require(fetchedTracker.entries.first)
+
+        #expect(updatedTracker.name == "Wellness Tracker")
+        #expect(updatedTracker.fields.map(\.id) == [tracker.fields[1].id, ratingFieldID])
+        #expect(updatedTracker.fields.map(\.name) == ["Note", "Score"])
+        #expect(entry.displayRows().first == EntryDisplayRow(label: "Rating", value: "8.0"))
+    }
+
     @Test func fetchTrackersReturnsNewestCreatedFirst() throws {
         let container = try ModelContainerFactory.makeTestingContainer()
         let repository = TrackerRepository(context: container.mainContext)
@@ -133,6 +168,11 @@ struct TrackerRepositoryTests {
                 values: [unknownFieldID: .number(8)]
             )
         }
+    }
+
+    @Test func repositoryErrorsHaveUserVisibleDescriptions() {
+        #expect(TrackerRepositoryError.trackerNotFound.errorDescription == "Tracker not found.")
+        #expect(TrackerRepositoryError.unknownField(FieldID()).errorDescription == "Entry contains an unknown field.")
     }
 
     @Test func partialEntryValuesDisplayAsBlanks() throws {

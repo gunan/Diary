@@ -2,6 +2,7 @@ import SwiftData
 import SwiftUI
 
 struct EntryEditorView: View {
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
 
     let tracker: TrackerModel
@@ -58,6 +59,12 @@ struct EntryEditorView: View {
         .navigationTitle("New Entry")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel") {
+                    dismiss()
+                }
+            }
+
             ToolbarItem(placement: .confirmationAction) {
                 Button("Save") {
                     save()
@@ -126,6 +133,7 @@ struct EntryEditorView: View {
             )
             savedEntry = entry
         } catch {
+            AppLog.persistenceError("Could not save entry: \(error.localizedDescription)")
             validationMessage = error.localizedDescription
         }
     }

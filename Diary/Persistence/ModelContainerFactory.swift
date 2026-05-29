@@ -21,6 +21,8 @@ enum AppLaunchOptions {
 
 @MainActor
 enum ModelContainerFactory {
+    typealias LegacyImporter = @MainActor (ModelContext) throws -> Void
+
     private static var schema: Schema {
         Schema([
             Diary.self,
@@ -35,10 +37,13 @@ enum ModelContainerFactory {
         ])
     }
 
-    static func makeModelContainer() -> ModelContainer {
+    static func makeModelContainer(
+        isStoredInMemoryOnly: Bool? = nil,
+        importLegacyData: LegacyImporter = LegacyDiaryImporter.importIfNeeded
+    ) -> ModelContainer {
         let configuration = ModelConfiguration(
             schema: schema,
-            isStoredInMemoryOnly: AppLaunchOptions.shouldUseInMemoryStore
+            isStoredInMemoryOnly: isStoredInMemoryOnly ?? AppLaunchOptions.shouldUseInMemoryStore
         )
 
         do {
@@ -47,9 +52,9 @@ enum ModelContainerFactory {
                 seedLegacySampleData(in: container.mainContext)
             }
             do {
-                try LegacyDiaryImporter.importIfNeeded(in: container.mainContext)
+                try importLegacyData(container.mainContext)
             } catch {
-                fatalError("Could not import legacy diaries: \(error)")
+                AppLog.persistenceError("Could not import legacy diaries: \(error.localizedDescription)")
             }
             return container
         } catch {

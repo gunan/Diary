@@ -12,6 +12,23 @@ struct FieldEditorView: View {
     @State private var selectorOptions = [SelectorOptionDraft(text: "")]
     @State private var validationMessages: [String] = []
 
+    init(
+        field: TrackerFieldDraft? = nil,
+        sortOrder: Int,
+        onSave: @escaping (TrackerFieldDraft) -> Void
+    ) {
+        self.sortOrder = sortOrder
+        self.onSave = onSave
+        _fieldID = State(initialValue: field?.id ?? FieldID())
+        _fieldName = State(initialValue: field?.name ?? "")
+        _selectedType = State(initialValue: field?.type ?? .text)
+
+        let options = field?.options ?? []
+        _selectorOptions = State(initialValue: options.isEmpty ? [SelectorOptionDraft(text: "")] : options.map {
+            SelectorOptionDraft(text: $0)
+        })
+    }
+
     var body: some View {
         NavigationStack {
             Form {
@@ -62,7 +79,7 @@ struct FieldEditorView: View {
                     }
                 }
             }
-            .navigationTitle("New Field")
+            .navigationTitle(fieldName.isEmpty ? "New Field" : "Edit Field")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

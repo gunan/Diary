@@ -29,6 +29,18 @@ struct TrackerDetailView: View {
         .navigationTitle(tracker?.name ?? "Tracker")
         .navigationBarTitleDisplayMode(.inline)
         .tint(AppBrand.accentColor)
+        .toolbar {
+            if let tracker {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        TrackerEditorView(tracker: tracker)
+                    } label: {
+                        Label("Edit Tracker", systemImage: "pencil")
+                    }
+                    .accessibilityIdentifier("edit-tracker-button")
+                }
+            }
+        }
     }
 
     private var tracker: TrackerModel? {

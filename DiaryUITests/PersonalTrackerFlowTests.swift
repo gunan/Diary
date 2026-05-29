@@ -17,6 +17,7 @@ final class PersonalTrackerFlowTests: XCTestCase {
         XCTAssertTrue(app.navigationBars["Mood Tracker"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["New Entry"].exists)
         XCTAssertTrue(app.buttons["Insights"].exists)
+        XCTAssertTrue(app.buttons["edit-tracker-button"].exists)
     }
 
     @MainActor
@@ -59,6 +60,26 @@ final class PersonalTrackerFlowTests: XCTestCase {
         app.buttons["save-tracker-button"].tap()
 
         XCTAssertTrue(app.staticTexts["Workout"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor
+    func testEditsTrackerNameFromDetail() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-ui-testing", "-seed-sample-data"]
+        app.launch()
+
+        XCTAssertTrue(app.staticTexts["Mood Tracker"].waitForExistence(timeout: 5))
+        app.staticTexts["Mood Tracker"].tap()
+        app.buttons["edit-tracker-button"].tap()
+
+        let trackerNameField = app.textFields["tracker-name-field"]
+        XCTAssertTrue(trackerNameField.waitForExistence(timeout: 5))
+        trackerNameField.tap()
+        trackerNameField.typeText(" Updated")
+
+        app.buttons["save-tracker-button"].tap()
+
+        XCTAssertTrue(app.navigationBars["Mood Tracker Updated"].waitForExistence(timeout: 5))
     }
 
     @MainActor

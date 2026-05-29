@@ -1,10 +1,18 @@
 import Foundation
 import SwiftData
 
-@MainActor
-enum TrackerRepositoryError: Error, Equatable {
+enum TrackerRepositoryError: Error, Equatable, LocalizedError {
     case trackerNotFound
     case unknownField(FieldID)
+
+    var errorDescription: String? {
+        switch self {
+        case .trackerNotFound:
+            return "Tracker not found."
+        case .unknownField:
+            return "Entry contains an unknown field."
+        }
+    }
 }
 
 @MainActor
@@ -43,6 +51,39 @@ final class TrackerRepository {
         context.insert(model)
         try context.save()
         return Self.domainTracker(from: model)
+    }
+
+    func updateTracker(id: TrackerID, with draft: TrackerDraft) throws -> Tracker {
+        let errors = TrackerValidator.validateTracker(draft)
+        if let error = errors.first {
+            throw error
+        }
+
+        let trackerModel = try requireTrackerModel(id: id)
+        let existingFieldsByID = Dictionary(uniqueKeysWithValues: trackerModel.fields.map { ($0.fieldID, $0) })
+        let updatedFields = draft.fields
+            .sorted(by: Self.fieldDraftSort)
+            .map { fieldDraft in
+                let model = existingFieldsByID[fieldDraft.id.rawValue] ?? FieldDefinitionModel(
+                    fieldID: fieldDraft.id.rawValue,
+                    name: fieldDraft.name,
+                    typeRaw: fieldDraft.type.rawValue,
+                    sortOrder: fieldDraft.sortOrder
+                )
+                model.name = fieldDraft.name.trimmingCharacters(in: .whitespacesAndNewlines)
+                model.typeRaw = fieldDraft.type.rawValue
+                model.sortOrder = fieldDraft.sortOrder
+                model.options = fieldDraft.options.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                model.minValue = fieldDraft.minValue
+                model.maxValue = fieldDraft.maxValue
+                return model
+            }
+
+        trackerModel.name = draft.name.trimmingCharacters(in: .whitespacesAndNewlines)
+        trackerModel.fields = updatedFields
+        trackerModel.updatedAt = Date()
+        try context.save()
+        return Self.domainTracker(from: trackerModel)
     }
 
     func createEntry(trackerID: TrackerID, values: [FieldID: EntryValue]) throws -> TrackerEntry {
@@ -97,7 +138,7 @@ private extension TrackerRepository {
         Tracker(
             id: TrackerID(model.trackerID),
             name: model.name,
-            fields: model.fields.map(domainField(from:)).sorted { $0.sortOrder < $1.sortOrder },
+            fields: model.fields.map(domainField(from:)).sorted(by: fieldSort),
             entries: model.entries.map(domainEntry(from:)).sorted { $0.createdAt > $1.createdAt },
             createdAt: model.createdAt,
             updatedAt: model.updatedAt
@@ -193,5 +234,19 @@ private extension TrackerRepository {
                 unavailableReason: reason
             )
         }
+    }
+
+    static func fieldDraftSort(_ lhs: TrackerFieldDraft, _ rhs: TrackerFieldDraft) -> Bool {
+        if lhs.sortOrder == rhs.sortOrder {
+            return lhs.id.rawValue.uuidString < rhs.id.rawValue.uuidString
+        }
+        return lhs.sortOrder < rhs.sortOrder
+    }
+
+    static func fieldSort(_ lhs: TrackerFieldDefinition, _ rhs: TrackerFieldDefinition) -> Bool {
+        if lhs.sortOrder == rhs.sortOrder {
+            return lhs.id.rawValue.uuidString < rhs.id.rawValue.uuidString
+        }
+        return lhs.sortOrder < rhs.sortOrder
     }
 }
