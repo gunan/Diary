@@ -25,6 +25,7 @@ final class DiaryUITestsLaunchTests: XCTestCase {
 
         XCTAssertTrue(app.navigationBars["Trackers"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Mood Tracker"].exists)
+        XCTAssertTrue(app.buttons["new-tracker-button"].exists)
 
         let attachment = XCTAttachment(screenshot: app.screenshot())
         attachment.name = "Launch Screen"
