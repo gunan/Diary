@@ -1,0 +1,30 @@
+name: Release Version Check
+
+on:
+  push:
+    branches:
+      - 'r*.*.*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-branch-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  version-check:
+    name: Require App Version To Match Branch
+    runs-on: macos-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Check release branch version
+        run: scripts/ci/check_release_branch_version.sh
