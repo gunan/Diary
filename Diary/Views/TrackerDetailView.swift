@@ -49,9 +49,13 @@ struct TrackerDetailView: View {
 }
 
 private struct TrackerDetailContent: View {
+    @Environment(\.modelContext) private var modelContext
+
     let tracker: TrackerModel
 
     @State private var isShowingEntryEditor = false
+    @State private var entryBeingEdited: EntryModel?
+    @State private var entryDeleteError: String?
 
     private var sortedFields: [FieldDefinitionModel] {
         tracker.fields.sorted {
@@ -62,8 +66,8 @@ private struct TrackerDetailContent: View {
         }
     }
 
-    private var recentEntries: [EntryModel] {
-        tracker.entries.sorted { $0.createdAt > $1.createdAt }.prefix(5).map { $0 }
+    private var entries: [EntryModel] {
+        tracker.entries.sorted { $0.createdAt > $1.createdAt }
     }
 
     var body: some View {
@@ -91,6 +95,39 @@ private struct TrackerDetailContent: View {
                 .controlSize(.large)
             }
 
+            if entries.isEmpty {
+                Section("Entries") {
+                    Text("No entries yet.")
+                        .foregroundStyle(.secondary)
+                }
+            } else {
+                Section("Entries") {
+                    ForEach(entries) { entry in
+                        NavigationLink {
+                            EntryDetailView(entry: entry, tracker: tracker)
+                        } label: {
+                            EntryRow(entry: entry)
+                        }
+                        .swipeActions {
+                            Button(role: .destructive) {
+                                delete(entry)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+
+                            Button {
+                                entryBeingEdited = entry
+                            } label: {
+                                Label("Edit", systemImage: "pencil")
+                            }
+                            .tint(AppBrand.accentColor)
+                        }
+                        .accessibilityIdentifier("entry-row")
+                        .accessibilityLabel(EntryRow.accessibilityLabel(for: entry))
+                    }
+                }
+            }
+
             Section("Summary") {
                 LabeledContent("Fields", value: "\(tracker.fields.count)")
                 LabeledContent("Entries", value: "\(tracker.entries.count)")
@@ -108,26 +145,87 @@ private struct TrackerDetailContent: View {
                     }
                 }
             }
-
-            if recentEntries.isEmpty {
-                Section("Recent Entries") {
-                    Text("No entries yet.")
-                        .foregroundStyle(.secondary)
-                }
-            } else {
-                Section("Recent Entries") {
-                    ForEach(recentEntries) { entry in
-                        NavigationLink {
-                            EntryDetailView(entry: entry)
-                        } label: {
-                            Text(entry.createdAt, format: .dateTime.month().day().year().hour().minute())
-                        }
-                    }
-                }
-            }
         }
         .navigationDestination(isPresented: $isShowingEntryEditor) {
             EntryEditorView(tracker: tracker)
+        }
+        .navigationDestination(item: $entryBeingEdited) { entry in
+            EntryEditorView(tracker: tracker, entry: entry)
+        }
+        .alert("Could not delete entry", isPresented: deleteErrorIsPresented) {
+            Button("OK", role: .cancel) {
+                entryDeleteError = nil
+            }
+        } message: {
+            Text(entryDeleteError ?? "")
+        }
+    }
+
+    private var deleteErrorIsPresented: Binding<Bool> {
+        Binding(
+            get: { entryDeleteError != nil },
+            set: { isPresented in
+                if !isPresented {
+                    entryDeleteError = nil
+                }
+            }
+        )
+    }
+
+    private func delete(_ entry: EntryModel) {
+        do {
+            try TrackerRepository(context: modelContext).deleteEntry(
+                trackerID: TrackerID(tracker.trackerID),
+                entryID: EntryID(entry.entryID)
+            )
+        } catch {
+            AppLog.persistenceError("Could not delete entry: \(error.localizedDescription)")
+            entryDeleteError = error.localizedDescription
+        }
+    }
+}
+
+private struct EntryRow: View {
+    let entry: EntryModel
+
+    private var domainEntry: TrackerEntry {
+        EntryModelMapper.domainEntry(from: entry)
+    }
+
+    private var summary: String? {
+        Self.summary(for: domainEntry)
+    }
+
+    static func accessibilityLabel(for entry: EntryModel) -> String {
+        let domainEntry = EntryModelMapper.domainEntry(from: entry)
+        let createdAt = entry.createdAt.formatted(date: .abbreviated, time: .shortened)
+        guard let summary = summary(for: domainEntry) else {
+            return createdAt
+        }
+
+        return "\(createdAt), \(summary)"
+    }
+
+    private static func summary(for entry: TrackerEntry) -> String? {
+        let rows = entry.displayRows()
+            .filter { !$0.value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+            .map { "\($0.label): \($0.value)" }
+
+        guard !rows.isEmpty else { return nil }
+        return rows.joined(separator: " | ")
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(entry.createdAt, format: .dateTime.month().day().year().hour().minute())
+                .font(.headline)
+
+            if let summary {
+                Text(summary)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+            }
         }
     }
 }

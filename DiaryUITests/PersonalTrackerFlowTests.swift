@@ -83,7 +83,7 @@ final class PersonalTrackerFlowTests: XCTestCase {
     }
 
     @MainActor
-    func testCreatesEntryAndShowsDetail() throws {
+    func testCreatesEntryAndReturnsToTrackerEntries() throws {
         let app = XCUIApplication()
         app.launchArguments = ["-ui-testing", "-seed-sample-data"]
         app.launch()
@@ -100,6 +100,9 @@ final class PersonalTrackerFlowTests: XCTestCase {
 
         app.buttons["save-entry-button"].tap()
 
-        XCTAssertTrue(app.staticTexts["9.0"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.navigationBars["Mood Tracker"].waitForExistence(timeout: 5))
+        let latestEntryRow = app.buttons["entry-row"].firstMatch
+        XCTAssertTrue(latestEntryRow.waitForExistence(timeout: 5))
+        XCTAssertTrue(latestEntryRow.label.contains("rating: 9.0"))
     }
 }

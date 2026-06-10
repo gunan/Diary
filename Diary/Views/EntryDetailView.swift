@@ -2,14 +2,35 @@ import SwiftData
 import SwiftUI
 
 struct EntryDetailView: View {
-    let entry: TrackerEntry
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+
+    private let staticEntry: TrackerEntry?
+    private let entryModel: EntryModel?
+    private let trackerModel: TrackerModel?
+
+    @State private var isShowingEditor = false
+    @State private var isShowingDeleteConfirmation = false
+    @State private var deleteErrorMessage: String?
 
     init(entry: TrackerEntry) {
-        self.entry = entry
+        staticEntry = entry
+        entryModel = nil
+        trackerModel = nil
     }
 
-    init(entry: EntryModel) {
-        self.entry = Self.domainEntry(from: entry)
+    init(entry: EntryModel, tracker: TrackerModel? = nil) {
+        staticEntry = nil
+        entryModel = entry
+        trackerModel = tracker
+    }
+
+    private var entry: TrackerEntry {
+        if let entryModel {
+            return EntryModelMapper.domainEntry(from: entryModel)
+        }
+
+        return staticEntry ?? TrackerEntry(id: EntryID(), createdAt: Date(), fieldSnapshots: [], values: [:])
     }
 
     var body: some View {
@@ -31,9 +52,85 @@ struct EntryDetailView: View {
         }
         .navigationTitle("Entry")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if canMutateEntry {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Button {
+                            isShowingEditor = true
+                        } label: {
+                            Label("Edit Entry", systemImage: "pencil")
+                        }
+
+                        Button(role: .destructive) {
+                            isShowingDeleteConfirmation = true
+                        } label: {
+                            Label("Delete Entry", systemImage: "trash")
+                        }
+                    } label: {
+                        Label("Entry Actions", systemImage: "ellipsis.circle")
+                    }
+                    .accessibilityIdentifier("entry-actions-button")
+                }
+            }
+        }
+        .navigationDestination(isPresented: $isShowingEditor) {
+            if let trackerModel, let entryModel {
+                EntryEditorView(tracker: trackerModel, entry: entryModel)
+            }
+        }
+        .confirmationDialog(
+            "Delete Entry?",
+            isPresented: $isShowingDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Delete Entry", role: .destructive) {
+                deleteEntry()
+            }
+            Button("Cancel", role: .cancel) {}
+        }
+        .alert("Could not delete entry", isPresented: deleteErrorIsPresented) {
+            Button("OK", role: .cancel) {
+                deleteErrorMessage = nil
+            }
+        } message: {
+            Text(deleteErrorMessage ?? "")
+        }
     }
 
-    private static func domainEntry(from model: EntryModel) -> TrackerEntry {
+    private var canMutateEntry: Bool {
+        entryModel != nil && trackerModel != nil
+    }
+
+    private var deleteErrorIsPresented: Binding<Bool> {
+        Binding(
+            get: { deleteErrorMessage != nil },
+            set: { isPresented in
+                if !isPresented {
+                    deleteErrorMessage = nil
+                }
+            }
+        )
+    }
+
+    private func deleteEntry() {
+        guard let entryModel, let trackerModel else { return }
+
+        do {
+            try TrackerRepository(context: modelContext).deleteEntry(
+                trackerID: TrackerID(trackerModel.trackerID),
+                entryID: EntryID(entryModel.entryID)
+            )
+            dismiss()
+        } catch {
+            AppLog.persistenceError("Could not delete entry: \(error.localizedDescription)")
+            deleteErrorMessage = error.localizedDescription
+        }
+    }
+}
+
+enum EntryModelMapper {
+    static func domainEntry(from model: EntryModel) -> TrackerEntry {
         let values = model.values
             .sorted { $0.valueID.uuidString < $1.valueID.uuidString }
             .reduce(into: [FieldID: EntryValue]()) { partialResult, valueModel in
@@ -59,7 +156,7 @@ struct EntryDetailView: View {
         )
     }
 
-    private static func domainValue(from model: EntryValueModel) -> EntryValue {
+    static func domainValue(from model: EntryValueModel) -> EntryValue {
         if let reason = model.unavailableReason {
             return .unavailable(reason)
         }

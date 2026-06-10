@@ -6,6 +6,7 @@ struct EntryEditorView: View {
     @Environment(\.modelContext) private var modelContext
 
     let tracker: TrackerModel
+    let entry: EntryModel?
 
     @State private var textValues: [FieldID: String] = [:]
     @State private var numberValues: [FieldID: String] = [:]
@@ -13,7 +14,12 @@ struct EntryEditorView: View {
     @State private var timeValues: [FieldID: Date] = [:]
     @State private var selectorValues: [FieldID: String] = [:]
     @State private var validationMessage: String?
-    @State private var savedEntry: TrackerEntry?
+    @State private var didInitialize = false
+
+    init(tracker: TrackerModel, entry: EntryModel? = nil) {
+        self.tracker = tracker
+        self.entry = entry
+    }
 
     private var trackerID: TrackerID {
         TrackerID(tracker.trackerID)
@@ -56,7 +62,7 @@ struct EntryEditorView: View {
                 }
             }
         }
-        .navigationTitle("New Entry")
+        .navigationTitle(navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
@@ -73,9 +79,6 @@ struct EntryEditorView: View {
             }
         }
         .onAppear(perform: initializeDefaults)
-        .navigationDestination(item: $savedEntry) { entry in
-            EntryDetailView(entry: entry)
-        }
     }
 
     @ViewBuilder
@@ -94,7 +97,7 @@ struct EntryEditorView: View {
             DatePicker(field.name, selection: timeBinding(for: field.id), displayedComponents: .hourAndMinute)
         case .selector:
             Picker(field.name, selection: selectorBinding(for: field)) {
-                ForEach(field.options, id: \.self) { option in
+                ForEach(selectorOptions(for: field), id: \.self) { option in
                     Text(option).tag(option)
                 }
             }
@@ -102,8 +105,18 @@ struct EntryEditorView: View {
     }
 
     private func initializeDefaults() {
+        guard !didInitialize else { return }
+        didInitialize = true
+
         let now = Date()
+        let existingValues = existingEntryValues()
+
         for field in fields {
+            if let value = existingValues[field.id] {
+                applyExisting(value, for: field)
+                continue
+            }
+
             switch field.type {
             case .date:
                 if dateValues[field.id] == nil {
@@ -127,11 +140,21 @@ struct EntryEditorView: View {
         validationMessage = nil
 
         do {
-            let entry = try TrackerRepository(context: modelContext).createEntry(
-                trackerID: trackerID,
-                values: entryValues()
-            )
-            savedEntry = entry
+            let values = try entryValues()
+            let repository = TrackerRepository(context: modelContext)
+            if let entry {
+                _ = try repository.updateEntry(
+                    trackerID: trackerID,
+                    entryID: EntryID(entry.entryID),
+                    values: values
+                )
+            } else {
+                _ = try repository.createEntry(
+                    trackerID: trackerID,
+                    values: values
+                )
+            }
+            dismiss()
         } catch {
             AppLog.persistenceError("Could not save entry: \(error.localizedDescription)")
             validationMessage = error.localizedDescription
@@ -209,6 +232,81 @@ struct EntryEditorView: View {
             get: { selectorValues[field.id] ?? field.options.first ?? "" },
             set: { selectorValues[field.id] = $0 }
         )
+    }
+
+    private var navigationTitle: String {
+        entry == nil ? "New Entry" : "Edit Entry"
+    }
+
+    private func selectorOptions(for field: TrackerFieldDefinition) -> [String] {
+        guard
+            let selectedOption = selectorValues[field.id],
+            !selectedOption.isEmpty,
+            !field.options.contains(selectedOption)
+        else {
+            return field.options
+        }
+        return [selectedOption] + field.options
+    }
+
+    private func existingEntryValues() -> [FieldID: EntryValue] {
+        guard let entry else { return [:] }
+        return entry.values
+            .sorted { $0.valueID.uuidString < $1.valueID.uuidString }
+            .reduce(into: [FieldID: EntryValue]()) { partialResult, valueModel in
+                let fieldID = FieldID(valueModel.fieldID)
+                if partialResult[fieldID] == nil {
+                    partialResult[fieldID] = Self.entryValue(from: valueModel)
+                }
+            }
+    }
+
+    private func applyExisting(_ value: EntryValue, for field: TrackerFieldDefinition) {
+        switch (field.type, value) {
+        case (.text, .text(let text)):
+            textValues[field.id] = text
+        case (.number, .number(let number)):
+            numberValues[field.id] = String(number)
+        case (.date, .date(let date)):
+            dateValues[field.id] = date
+        case (.time, .time(let time)):
+            let calendar = Calendar.current
+            var components = calendar.dateComponents([.year, .month, .day], from: Date())
+            components.hour = time.hour
+            components.minute = time.minute
+            timeValues[field.id] = calendar.date(from: components) ?? Date()
+        case (.selector, .selector(let option)):
+            selectorValues[field.id] = option
+        default:
+            break
+        }
+    }
+
+    private static func entryValue(from model: EntryValueModel) -> EntryValue {
+        if let reason = model.unavailableReason {
+            return .unavailable(reason)
+        }
+
+        switch TrackerFieldType(rawValue: model.typeRaw) ?? .text {
+        case .text:
+            return .text(model.textValue ?? "")
+        case .number:
+            return .number(model.numberValue ?? 0)
+        case .date:
+            return .date(model.dateValue ?? Date(timeIntervalSince1970: 0))
+        case .time:
+            guard
+                let hour = model.timeHour,
+                let minute = model.timeMinute,
+                (0...23).contains(hour),
+                (0...59).contains(minute)
+            else {
+                return .unavailable("Invalid time")
+            }
+            return .time(TimeOfDay(hour: hour, minute: minute))
+        case .selector:
+            return .selector(model.textValue ?? "")
+        }
     }
 
     private func accessibilityName(for field: TrackerFieldDefinition) -> String {

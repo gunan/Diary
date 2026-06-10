@@ -3,12 +3,15 @@ import SwiftData
 
 enum TrackerRepositoryError: Error, Equatable, LocalizedError {
     case trackerNotFound
+    case entryNotFound
     case unknownField(FieldID)
 
     var errorDescription: String? {
         switch self {
         case .trackerNotFound:
             return "Tracker not found."
+        case .entryNotFound:
+            return "Entry not found."
         case .unknownField:
             return "Entry contains an unknown field."
         }
@@ -88,29 +91,11 @@ final class TrackerRepository {
 
     func createEntry(trackerID: TrackerID, values: [FieldID: EntryValue]) throws -> TrackerEntry {
         let trackerModel = try requireTrackerModel(id: trackerID)
-        let sortedFields = trackerModel.fields.sorted { $0.sortOrder < $1.sortOrder }
-        let domainFields = sortedFields.map(Self.domainField(from:))
-        let knownFieldIDs = Set(domainFields.map(\.id))
-
-        for fieldID in values.keys where !knownFieldIDs.contains(fieldID) {
-            throw TrackerRepositoryError.unknownField(fieldID)
-        }
-
-        for field in domainFields {
-            if let value = values[field.id], let error = TrackerValidator.validate(value: value, for: field) {
-                throw error
-            }
-        }
+        let domainFields = Self.domainFields(from: trackerModel)
+        try Self.validate(values: values, for: domainFields)
 
         let entry = EntryModel(createdAt: Date())
-        entry.snapshots = domainFields.map {
-            FieldSnapshotModel(
-                fieldID: $0.id.rawValue,
-                name: $0.name,
-                typeRaw: $0.type.rawValue,
-                sortOrder: $0.sortOrder
-            )
-        }
+        entry.snapshots = Self.snapshotModels(from: domainFields)
         entry.values = values.map { fieldID, value in
             Self.valueModel(fieldID: fieldID, value: value)
         }
@@ -118,6 +103,43 @@ final class TrackerRepository {
         trackerModel.updatedAt = Date()
         try context.save()
         return Self.domainEntry(from: entry)
+    }
+
+    func updateEntry(trackerID: TrackerID, entryID: EntryID, values: [FieldID: EntryValue]) throws -> TrackerEntry {
+        let trackerModel = try requireTrackerModel(id: trackerID)
+        guard let entry = trackerModel.entries.first(where: { $0.entryID == entryID.rawValue }) else {
+            throw TrackerRepositoryError.entryNotFound
+        }
+
+        let domainFields = Self.domainFields(from: trackerModel)
+        try Self.validate(values: values, for: domainFields)
+
+        let previousValues = entry.values
+        let previousSnapshots = entry.snapshots
+
+        entry.values = values.map { fieldID, value in
+            Self.valueModel(fieldID: fieldID, value: value)
+        }
+        entry.snapshots = Self.snapshotModels(from: domainFields)
+        trackerModel.updatedAt = Date()
+
+        previousValues.forEach(context.delete)
+        previousSnapshots.forEach(context.delete)
+
+        try context.save()
+        return Self.domainEntry(from: entry)
+    }
+
+    func deleteEntry(trackerID: TrackerID, entryID: EntryID) throws {
+        let trackerModel = try requireTrackerModel(id: trackerID)
+        guard let entryIndex = trackerModel.entries.firstIndex(where: { $0.entryID == entryID.rawValue }) else {
+            throw TrackerRepositoryError.entryNotFound
+        }
+
+        let entry = trackerModel.entries.remove(at: entryIndex)
+        context.delete(entry)
+        trackerModel.updatedAt = Date()
+        try context.save()
     }
 }
 
@@ -155,6 +177,35 @@ private extension TrackerRepository {
             minValue: model.minValue,
             maxValue: model.maxValue
         )
+    }
+
+    static func domainFields(from trackerModel: TrackerModel) -> [TrackerFieldDefinition] {
+        trackerModel.fields.map(domainField(from:)).sorted(by: fieldSort)
+    }
+
+    static func validate(values: [FieldID: EntryValue], for fields: [TrackerFieldDefinition]) throws {
+        let knownFieldIDs = Set(fields.map(\.id))
+
+        for fieldID in values.keys where !knownFieldIDs.contains(fieldID) {
+            throw TrackerRepositoryError.unknownField(fieldID)
+        }
+
+        for field in fields {
+            if let value = values[field.id], let error = TrackerValidator.validate(value: value, for: field) {
+                throw error
+            }
+        }
+    }
+
+    static func snapshotModels(from fields: [TrackerFieldDefinition]) -> [FieldSnapshotModel] {
+        fields.map {
+            FieldSnapshotModel(
+                fieldID: $0.id.rawValue,
+                name: $0.name,
+                typeRaw: $0.type.rawValue,
+                sortOrder: $0.sortOrder
+            )
+        }
     }
 
     static func domainEntry(from model: EntryModel) -> TrackerEntry {

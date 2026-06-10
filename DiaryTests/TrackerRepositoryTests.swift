@@ -40,6 +40,61 @@ struct TrackerRepositoryTests {
         #expect(entry.displayRows()[0].value == "8.0")
     }
 
+    @Test func updatesEntryValuesAndRefreshesSnapshots() throws {
+        let container = try ModelContainerFactory.makeTestingContainer()
+        let repository = TrackerRepository(context: container.mainContext)
+        let tracker = try repository.createTracker(TrackerDraft(
+            name: "Mood Tracker",
+            fields: [
+                TrackerFieldDraft(name: "Rating", type: .number, sortOrder: 0),
+            ]
+        ))
+        let ratingFieldID = tracker.fields[0].id
+        let entry = try repository.createEntry(
+            trackerID: tracker.id,
+            values: [ratingFieldID: .number(8)]
+        )
+        _ = try repository.updateTracker(
+            id: tracker.id,
+            with: TrackerDraft(
+                name: "Mood Tracker",
+                fields: [
+                    TrackerFieldDraft(id: ratingFieldID, name: "Score", type: .number, sortOrder: 0),
+                ]
+            )
+        )
+
+        let updatedEntry = try repository.updateEntry(
+            trackerID: tracker.id,
+            entryID: entry.id,
+            values: [ratingFieldID: .number(9)]
+        )
+
+        #expect(updatedEntry.displayRows() == [
+            EntryDisplayRow(label: "Score", value: "9.0"),
+        ])
+    }
+
+    @Test func deletesEntryFromTracker() throws {
+        let container = try ModelContainerFactory.makeTestingContainer()
+        let repository = TrackerRepository(context: container.mainContext)
+        let tracker = try repository.createTracker(TrackerDraft(
+            name: "Mood Tracker",
+            fields: [
+                TrackerFieldDraft(name: "Energy", type: .number, sortOrder: 0),
+            ]
+        ))
+        let entry = try repository.createEntry(
+            trackerID: tracker.id,
+            values: [tracker.fields[0].id: .number(8)]
+        )
+
+        try repository.deleteEntry(trackerID: tracker.id, entryID: entry.id)
+
+        let fetchedTracker = try #require(try repository.fetchTrackers().first)
+        #expect(fetchedTracker.entries.isEmpty)
+    }
+
     @Test func updatingTrackerKeepsFieldIDsAndExistingEntrySnapshots() throws {
         let container = try ModelContainerFactory.makeTestingContainer()
         let repository = TrackerRepository(context: container.mainContext)
@@ -170,8 +225,28 @@ struct TrackerRepositoryTests {
         }
     }
 
+    @Test func missingEntryIDThrowsEntryNotFound() throws {
+        let container = try ModelContainerFactory.makeTestingContainer()
+        let repository = TrackerRepository(context: container.mainContext)
+        let tracker = try repository.createTracker(TrackerDraft(
+            name: "Mood Tracker",
+            fields: [
+                TrackerFieldDraft(name: "Energy", type: .number, sortOrder: 0),
+            ]
+        ))
+
+        #expect(throws: TrackerRepositoryError.entryNotFound) {
+            try repository.updateEntry(
+                trackerID: tracker.id,
+                entryID: EntryID(),
+                values: [tracker.fields[0].id: .number(8)]
+            )
+        }
+    }
+
     @Test func repositoryErrorsHaveUserVisibleDescriptions() {
         #expect(TrackerRepositoryError.trackerNotFound.errorDescription == "Tracker not found.")
+        #expect(TrackerRepositoryError.entryNotFound.errorDescription == "Entry not found.")
         #expect(TrackerRepositoryError.unknownField(FieldID()).errorDescription == "Entry contains an unknown field.")
     }
 

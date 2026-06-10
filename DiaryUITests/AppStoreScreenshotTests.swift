@@ -28,23 +28,28 @@ final class AppStoreScreenshotTests: XCTestCase {
         ratingField.tap()
         ratingField.typeText("9")
         app.buttons["save-entry-button"].tap()
-        XCTAssertTrue(app.staticTexts["9.0"].waitForExistence(timeout: 8))
-        try capture("04-entry-detail", label: "Entry detail")
+        XCTAssertTrue(app.navigationBars["Mood Tracker"].waitForExistence(timeout: 8))
+        let latestEntryRow = app.buttons["entry-row"].firstMatch
+        XCTAssertTrue(latestEntryRow.waitForExistence(timeout: 8))
+        XCTAssertTrue(latestEntryRow.label.contains("rating: 9.0"))
+        try capture("04-entries", label: "Entries")
+
+        latestEntryRow.tap()
+        XCTAssertTrue(app.navigationBars["Entry"].waitForExistence(timeout: 8))
+        try capture("05-entry-detail", label: "Entry detail")
 
         tapBack(in: app)
-        XCTAssertTrue(app.navigationBars["New Entry"].waitForExistence(timeout: 8))
-        app.buttons["Cancel"].tap()
         XCTAssertTrue(app.navigationBars["Mood Tracker"].waitForExistence(timeout: 8))
         app.buttons["Insights"].tap()
         XCTAssertTrue(app.navigationBars["Insights"].waitForExistence(timeout: 8))
         XCTAssertTrue(app.switches["chart-field-rating"].waitForExistence(timeout: 8))
-        try capture("05-insights", label: "Insights")
+        try capture("06-insights", label: "Insights")
 
         tapBack(in: app)
         XCTAssertTrue(app.navigationBars["Mood Tracker"].waitForExistence(timeout: 8))
         app.buttons["edit-tracker-button"].tap()
         XCTAssertTrue(app.navigationBars["Edit Tracker"].waitForExistence(timeout: 8))
-        try capture("06-customize-tracker", label: "Customize tracker")
+        try capture("07-customize-tracker", label: "Customize tracker")
     }
 
     private func capture(_ filename: String, label: String) throws {
